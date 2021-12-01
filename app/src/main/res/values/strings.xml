@@ -14,5 +14,7 @@
     // NavigationDrawer text
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title">Go4Lunch</string>
+    <string name="user_picture">user picture</string>
 
 </resources>
