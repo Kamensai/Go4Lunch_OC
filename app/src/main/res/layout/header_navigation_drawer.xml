@@ -4,10 +4,9 @@
     android:id="@+id/header_navigation_drawer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/ic_launcher_background"
+    android:background="@drawable/restaurant"
     android:orientation="vertical">
 
-    <!-- TODO : Faire le constrainlayout pour l'image de derrière -->
     <LinearLayout
         android:id="@+id/title_header_navigation_drawer"
         android:layout_width="match_parent"
@@ -31,46 +30,45 @@
         android:id="@+id/user_details_header_navigation_drawer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/title_header_navigation_drawer"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/title_header_navigation_drawer">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/user_picture_header_navigation_drawer"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="10dp"
-            android:src="@color/black"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:contentDescription="@string/user_picture" />
+            <ImageView
+                android:id="@+id/user_picture_header_navigation_drawer"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginBottom="10dp"
+                android:contentDescription="@string/user_picture"
+                android:src="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        <TextView
-            android:id="@+id/user_name_header_navigation_drawer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:text="@string/user_name"
-            android:textAppearance="?attr/textAppearanceHeadline6"
-            app:layout_constraintStart_toEndOf="@id/user_picture_header_navigation_drawer"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            <TextView
+                android:id="@+id/user_name_header_navigation_drawer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:text="@string/user_name"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@id/user_picture_header_navigation_drawer"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/user_email_header_navigation_drawer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:text="@string/user_mail_adress"
-            android:textAppearance="?attr/textAppearanceBody2"
-            android:textColor="@color/material_on_surface_emphasis_medium"
-            app:layout_constraintStart_toEndOf="@id/user_picture_header_navigation_drawer"
-            app:layout_constraintTop_toBottomOf="@id/user_name_header_navigation_drawer"
-            />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/user_email_header_navigation_drawer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:text="@string/user_mail_adress"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@id/user_picture_header_navigation_drawer"
+                app:layout_constraintTop_toBottomOf="@id/user_name_header_navigation_drawer" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
