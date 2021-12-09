@@ -16,5 +16,11 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title">Go4Lunch</string>
     <string name="user_picture">user picture</string>
+    <string name="restaurant_name">restaurant_name</string>
+    <string name="call">CALL</string>
+    <string name="like">LIKE</string>
+    <string name="website">WEBSITE</string>
+    <string name="is_joining">is joining</string>
+    <string name="name_is_joining">name is joining</string>
 
 </resources>

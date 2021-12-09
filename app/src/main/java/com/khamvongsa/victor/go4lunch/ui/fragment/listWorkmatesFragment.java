@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 /**
  * Created by <Victor Khamvongsa> on <18/11/2021>
  */
-public class listViewFragment extends Fragment {
+public class listWorkmatesFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -23,7 +23,7 @@ public class listViewFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public listViewFragment() {
+    public listWorkmatesFragment() {
         // Required empty public constructor
     }
 
@@ -35,8 +35,8 @@ public class listViewFragment extends Fragment {
      * @return A new instance of fragment mapView.
      */
     // TODO: Rename and change types and number of parameters
-    public static listViewFragment newInstance(String param1, String param2) {
-        listViewFragment fragment = new listViewFragment();
+    public static listWorkmatesFragment newInstance(String param1, String param2) {
+        listWorkmatesFragment fragment = new listWorkmatesFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -57,6 +57,6 @@ public class listViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_list_view, container, false);
+        return inflater.inflate(R.layout.fragment_workmates, container, false);
     }
 }

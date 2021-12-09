@@ -13,13 +13,13 @@
 
     <fragment
         android:id="@+id/navigation_list_view"
-        android:name="com.khamvongsa.victor.go4lunch.ui.fragment.listViewFragment"
+        android:name="com.khamvongsa.victor.go4lunch.ui.fragment.listViewRestaurantFragment"
         android:label="@string/list_view"
         tools:layout="@layout/fragment_list_view" />
 
     <fragment
         android:id="@+id/navigation_workmates"
-        android:name="com.khamvongsa.victor.go4lunch.ui.fragment.workmatesFragment"
+        android:name="com.khamvongsa.victor.go4lunch.ui.fragment.listWorkmatesFragment"
         android:label="@string/workmates"
         tools:layout="@layout/fragment_workmates" />
 
