@@ -1,8 +1,11 @@
 package com.khamvongsa.victor.go4lunch.ui;
 
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.Window;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -11,9 +14,11 @@ import com.khamvongsa.victor.go4lunch.R;
 
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -31,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     Toolbar mToolbar;
+    ActionBarDrawerToggle mToggle;
 
 
     @Override
@@ -44,9 +50,34 @@ public class MainActivity extends AppCompatActivity {
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         // NavigationDrawer menu.
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
-        mDrawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
+        mNavigationView.bringToFront();
+        mToggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+        mDrawerLayout.addDrawerListener(mToggle);
+        mToggle.syncState();
+
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch (id) {
+                    case R.id.navigation_drawer_lunch:
+                        //Do some thing here
+                        Intent i = new Intent(MainActivity.this, RestaurantActivity.class);
+                        startActivity(i);
+                        // add navigation drawer item onclick method here
+                    case R.id.navigation_drawer_settings:
+                        //Do some thing here
+                        // add navigation drawer item onclick method here
+                        break;
+                    case R.id.navigation_drawer_logout:
+                        //Do some thing here
+                        // add navigation drawer item onclick method here
+                        break;
+                }
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
 
         //Initialize Bottom Navigation View.
         mBottomNavigationView = findViewById(R.id.bottom_navigation_view);
@@ -61,5 +92,39 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, mNavController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(mBottomNavigationView, mNavController);
 
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (mToggle.onOptionsItemSelected(item))
+            return true;
+
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.string.settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
+        else
+        {super.onBackPressed();
+        }
     }
 }

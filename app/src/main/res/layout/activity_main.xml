@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    tools:context=".ui.MainActivity"
     tools:openDrawer="start">
 
     <com.google.android.material.navigation.NavigationView
@@ -17,7 +18,11 @@
         app:headerLayout="@layout/header_navigation_drawer"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
-        app:menu="@menu/navigation_drawer" />
+        app:menu="@menu/navigation_drawer" >
+
+        <!-- TODO : LinearLayout pour mettre l'icone (bol) par dessus le background" -->
+
+    </com.google.android.material.navigation.NavigationView>
 
     <!-- Your contents -->
     <include

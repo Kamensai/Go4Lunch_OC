@@ -22,5 +22,7 @@
     <string name="website">WEBSITE</string>
     <string name="is_joining">is joining</string>
     <string name="name_is_joining">name is joining</string>
+    <string name="restaurant">Restaurant</string>
+    <string name="adress_restaurant">adress restaurant</string>
 
 </resources>
