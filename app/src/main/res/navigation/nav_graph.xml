@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_map_view"
-        android:name="com.khamvongsa.victor.go4lunch.ui.fragment.mapViewFragment"
+        android:name="com.khamvongsa.victor.go4lunch.ui.fragment.MapViewFragment"
         android:label="@string/map_view"
         tools:layout="@layout/fragment_map_view" />
 
     <fragment
         android:id="@+id/navigation_list_view"
-        android:name="com.khamvongsa.victor.go4lunch.ui.fragment.listViewRestaurantFragment"
+        android:name="com.khamvongsa.victor.go4lunch.ui.fragment.ListViewRestaurantFragment"
         android:label="@string/list_view"
         tools:layout="@layout/fragment_list_view_restaurants" />
 
     <fragment
         android:id="@+id/navigation_workmates"
-        android:name="com.khamvongsa.victor.go4lunch.ui.fragment.listWorkmatesFragment"
+        android:name="com.khamvongsa.victor.go4lunch.ui.fragment.ListWorkmatesFragment"
         android:label="@string/workmates"
         tools:layout="@layout/fragment_list_workmates" />
 

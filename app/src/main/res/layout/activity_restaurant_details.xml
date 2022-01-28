@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/orange"
                 android:textColor="@color/white"
-                android:text="@string/adress_restaurant"
+                android:text="@string/address_restaurant"
                 android:paddingHorizontal="20dp"
                 android:paddingBottom="20dp"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -65,8 +65,11 @@ public class MainActivity extends AppCompatActivity {
                         Intent i = new Intent(MainActivity.this, RestaurantActivity.class);
                         startActivity(i);
                         // add navigation drawer item onclick method here
+                        break;
                     case R.id.navigation_drawer_settings:
                         //Do some thing here
+                        Intent j = new Intent(MainActivity.this, SettingsActivity.class);
+                        startActivity(j);
                         // add navigation drawer item onclick method here
                         break;
                     case R.id.navigation_drawer_logout:

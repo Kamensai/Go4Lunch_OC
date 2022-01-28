@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * Created by <Victor Khamvongsa> on <18/11/2021>
  */
-public class listWorkmatesFragment extends Fragment {
+public class ListWorkmatesFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,7 +28,7 @@ public class listWorkmatesFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public listWorkmatesFragment() {
+    public ListWorkmatesFragment() {
         // Required empty public constructor
     }
 
@@ -40,8 +40,8 @@ public class listWorkmatesFragment extends Fragment {
      * @return A new instance of fragment mapView.
      */
     // TODO: Rename and change types and number of parameters
-    public static listWorkmatesFragment newInstance(String param1, String param2) {
-        listWorkmatesFragment fragment = new listWorkmatesFragment();
+    public static ListWorkmatesFragment newInstance(String param1, String param2) {
+        ListWorkmatesFragment fragment = new ListWorkmatesFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);

@@ -1,6 +1,5 @@
 package com.khamvongsa.victor.go4lunch.ui.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,26 +8,22 @@ import android.view.ViewGroup;
 import com.khamvongsa.victor.go4lunch.R;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by <Victor Khamvongsa> on <18/11/2021>
  */
-public class listViewRestaurantFragment extends Fragment {
+public class MapViewFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private RecyclerView mRecyclerView;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
-    public listViewRestaurantFragment() {
+    public MapViewFragment() {
         // Required empty public constructor
     }
 
@@ -37,11 +32,11 @@ public class listViewRestaurantFragment extends Fragment {
      * this fragment using the provided parameters.
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment list_view_restaurant.
+     * @return A new instance of fragment mapView.
      */
     // TODO: Rename and change types and number of parameters
-    public static listViewRestaurantFragment newInstance(String param1, String param2) {
-        listViewRestaurantFragment fragment = new listViewRestaurantFragment();
+    public static MapViewFragment newInstance(String param1, String param2) {
+        MapViewFragment fragment = new MapViewFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -62,11 +57,6 @@ public class listViewRestaurantFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_list_view_restaurants, container, false);
-        Context context = view.getContext();
-        mRecyclerView = (RecyclerView) view;
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        return view;
+        return inflater.inflate(R.layout.fragment_map_view, container, false);
     }
 }
