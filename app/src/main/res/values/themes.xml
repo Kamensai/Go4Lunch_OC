@@ -17,6 +17,25 @@
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
     </style>
 
+    <!-- STYLE SIGN-IN ACTIVITY -->
+    <style name="LoginTheme" parent="Theme.Go4Lunch">
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorPrimaryDark">@color/red</item>
+        <item name="colorAccent">#FFA000</item>
+        <item name="colorButtonNormal">#FF5252</item>
+        <item name="colorControlNormal">@android:color/darker_gray</item>
+        <item name="colorControlActivated">@android:color/darker_gray</item>
+        <item name="colorControlHighlight">@android:color/darker_gray</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/darker_gray</item>
+        <item name="android:textColorSecondary">@android:color/darker_gray</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:textColorHint">@android:color/darker_gray</item>
+    </style>
+
+
     <style name="SettingsActivityTheme" parent="Theme.Go4Lunch">
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:statusBarColor">@color/red</item>
