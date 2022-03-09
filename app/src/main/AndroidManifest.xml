@@ -47,7 +47,11 @@
             android:name=".ui.SettingsActivity"
             android:label="@string/title_settings"
             android:theme="@style/SettingsActivityTheme" />
-        <activity android:name=".ui.MainActivity">
+
+        <activity android:name=".ui.MainActivity"
+            android:label="@string/restaurant" />
+
+        <activity android:name=".ui.SignInActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

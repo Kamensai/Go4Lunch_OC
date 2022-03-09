@@ -13,6 +13,8 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -56,25 +58,10 @@ public class MainActivity extends AppCompatActivity {
     Toolbar mToolbar;
     ActionBarDrawerToggle mToggle;
 
-    // SIGN IN
-    private static final int RC_SIGN_IN = 123;
-
-    // See: https://developer.android.com/training/basics/intents/result
-    private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
-            new FirebaseAuthUIActivityResultContract(),
-            new ActivityResultCallback<FirebaseAuthUIAuthenticationResult>() {
-                @Override
-                public void onActivityResult(FirebaseAuthUIAuthenticationResult result) {
-                    onSignInResult(result);
-                }
-            }
-    );
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startSignInActivity();
         setContentView(R.layout.activity_main);
 
         //Initialize NavigationDrawer.
@@ -106,7 +93,15 @@ public class MainActivity extends AppCompatActivity {
                         // add navigation drawer item onclick method here
                         break;
                     case R.id.navigation_drawer_logout:
-                        //Do some thing here
+                        AuthUI.getInstance()
+                                .signOut(MainActivity.this)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        Intent i = new Intent(MainActivity.this, SignInActivity.class);
+                                        startActivity(i);
+                                        finish();
+                                    }
+                                });
                         // add navigation drawer item onclick method here
                         break;
                 }
@@ -129,94 +124,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(mBottomNavigationView, mNavController);
 
     }
-
-    // SIGN IN ACTIVITY
-
-    private void startSignInActivity(){
-
-        // Choose authentication providers
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build(),
-                new AuthUI.IdpConfig.FacebookBuilder().build());
-
-        // Launch the activity
-        Intent signInIntent = AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setTheme(R.style.LoginTheme)
-                        .setAvailableProviders(providers)
-                        .setIsSmartLockEnabled(false, true)
-                        .setLogo(R.drawable.com_facebook_button_icon)
-                        .build();
-        signInLauncher.launch(signInIntent);
-    }
-
-
-    private void onSignInResult(FirebaseAuthUIAuthenticationResult result) {
-        IdpResponse response = result.getIdpResponse();
-        if (result.getResultCode() == RESULT_OK) {
-            // Successfully signed in
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            showSnackBar(getString(R.string.connection_succeed));
-            // ...
-        } else {
-            // Sign in failed. If response is null the user canceled the
-            // sign-in flow using the back button. Otherwise check
-            // response.getError().getErrorCode() and handle the error.
-            // ...
-            // ERRORS
-            if (response == null) {
-                showSnackBar(getString(R.string.error_authentication_canceled));
-            } else if (response.getError()!= null) {
-                if(response.getError().getErrorCode() == ErrorCodes.NO_NETWORK){
-                    showSnackBar(getString(R.string.error_no_internet));
-                } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    showSnackBar(getString(R.string.error_unknown_error));
-                }
-            }
-        }
-    }
-
-    // TODO: Pourquoi faire une BaseActivity?
-    // Show Snack Bar with a message
-    private void showSnackBar( String message){
-        Snackbar.make(getWindow().getDecorView().getRootView(), message, Snackbar.LENGTH_SHORT).show();
-    }
-/*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        this.handleResponseAfterSignIn(requestCode, resultCode, data);
-    }
-
-
-
-    // Method that handles response after SignIn Activity close
-    private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data){
-
-        IdpResponse response = IdpResponse.fromResultIntent(data);
-
-        if (requestCode == RC_SIGN_IN) {
-            // SUCCESS
-            if (resultCode == RESULT_OK) {
-                userManager.createUser();
-                showSnackBar(getString(R.string.connection_succeed));
-            } else {
-                // ERRORS
-                if (response == null) {
-                    showSnackBar(getString(R.string.error_authentication_canceled));
-                } else if (response.getError()!= null) {
-                    if(response.getError().getErrorCode() == ErrorCodes.NO_NETWORK){
-                        showSnackBar(getString(R.string.error_no_internet));
-                    } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                        showSnackBar(getString(R.string.error_unknown_error));
-                    }
-                }
-            }
-        }
-    }
-
- */
 
     // TOGGLE MENU
     @Override
