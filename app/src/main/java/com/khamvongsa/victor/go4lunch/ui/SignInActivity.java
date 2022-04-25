@@ -3,7 +3,6 @@ package com.khamvongsa.victor.go4lunch.ui;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
@@ -13,6 +12,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.khamvongsa.victor.go4lunch.R;
+import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -74,8 +74,8 @@ public class SignInActivity extends AppCompatActivity {
             // Successfully signed in
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             showSnackBar(getString(R.string.connection_succeed));
-            Intent i = new Intent(SignInActivity.this, MainActivity.class);
-            startActivity(i);
+            NavigationHelper.launchNewActivity(SignInActivity.this, MainActivity.class);
+
             // ...
         } else {
             // Sign in failed. If response is null the user canceled the
