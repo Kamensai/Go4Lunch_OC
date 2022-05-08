@@ -110,7 +110,7 @@ public class MapViewFragment extends Fragment {
 
                 getDeviceLocation();
 
-                showCurrentPlace();
+                showNearPlaces();
             }
         });
         // Inflate the layout for this fragment
@@ -218,7 +218,7 @@ public class MapViewFragment extends Fragment {
         }
     }
 
-    private void showCurrentPlace() {
+    private void showNearPlaces() {
         if (mMap == null) {
             return;
         }
