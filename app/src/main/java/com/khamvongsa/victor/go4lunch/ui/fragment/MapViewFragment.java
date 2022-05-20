@@ -1,5 +1,6 @@
 package com.khamvongsa.victor.go4lunch.ui.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -20,22 +21,23 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.khamvongsa.victor.go4lunch.BuildConfig;
 import com.khamvongsa.victor.go4lunch.R;
+import com.khamvongsa.victor.go4lunch.model.NearbyRestaurant;
 import com.khamvongsa.victor.go4lunch.ui.MainActivity;
+import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
 
-import java.util.Arrays;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 
 /**
  * Created by <Victor Khamvongsa> on <18/11/2021>
@@ -52,15 +54,13 @@ public class MapViewFragment extends Fragment {
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-
-    private final LatLng defaultLocation = new LatLng(45.188529, 5.724524);
+    private final LatLng defaultLocation = new LatLng(45.1553, 5.3203);
     private static final int DEFAULT_ZOOM = 16;
     private boolean locationPermissionGranted;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
     private Location lastKnownLocation;
     private CameraPosition cameraPosition;
-
 
     // Keys for storing activity state.
     // [START maps_current_place_state_keys]
@@ -75,7 +75,8 @@ public class MapViewFragment extends Fragment {
     private List[] likelyPlaceAttributions;
     private LatLng[] likelyPlaceLatLngs;
 
-
+    //FOR DATA
+    private Disposable disposable;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -110,11 +111,10 @@ public class MapViewFragment extends Fragment {
 
                 getDeviceLocation();
 
-                showNearPlaces();
+                // showNearPlaces();
             }
         });
         // Inflate the layout for this fragment
-
         return view;
     }
 
@@ -165,7 +165,8 @@ public class MapViewFragment extends Fragment {
         updateLocationUI();
     }
 
-    private void updateLocationUI() {
+    @SuppressLint("MissingPermission")
+    public void updateLocationUI() {
         if (mMap == null) {
             return;
         }
@@ -191,18 +192,21 @@ public class MapViewFragment extends Fragment {
          */
         try {
             if (locationPermissionGranted) {
-                Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+                @SuppressLint("MissingPermission") Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
                 locationResult.addOnCompleteListener( this.requireActivity(), new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             lastKnownLocation = task.getResult();
+                            // TODO : Afficher les restaurants proches.
                             if (lastKnownLocation != null) {
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(lastKnownLocation.getLatitude(),
                                                 lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                executeHttpRequestWithRetrofit(lastKnownLocation);
                             }
+
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -218,6 +222,7 @@ public class MapViewFragment extends Fragment {
         }
     }
 
+    /*
     private void showNearPlaces() {
         if (mMap == null) {
             return;
@@ -303,4 +308,50 @@ public class MapViewFragment extends Fragment {
             getLocationPermission();
         }
     }
+
+     */
+
+    // -------------------
+    // HTTP (RxJAVA)
+    // -------------------
+
+    private void executeHttpRequestWithRetrofit(Location lastKnownLocation){
+        String location = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
+        this.disposable = MapAPIStream.streamFetchNearbyRestaurant(location).subscribeWith(new DisposableObserver<NearbyRestaurant>() {
+            @Override
+            public void onNext(@NotNull NearbyRestaurant restaurants) {
+                // 6 - Update RecyclerView after getting results from Googlemap API
+                mMap.clear();
+                for (NearbyRestaurant.PlaceResults r : restaurants.getPlaceResults()) {
+                    double lat = r.getGeometry().getLocation().getLat();
+                    double lng = r.getGeometry().getLocation().getLng();
+                    String name = r.getName();
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    LatLng latLng = new LatLng(lat, lng);
+                    markerOptions.position(latLng);
+                    markerOptions.title(name);
+                    mMap.addMarker(markerOptions);
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) { }
+
+            @Override
+            public void onComplete() { }
+        });
+    }
+
+    private void disposeWhenDestroy(){
+        if (this.disposable != null && !this.disposable.isDisposed()) this.disposable.dispose();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.disposeWhenDestroy();
+    }
+
+
+
 }
