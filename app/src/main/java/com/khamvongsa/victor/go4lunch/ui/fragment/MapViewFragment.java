@@ -24,7 +24,7 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.khamvongsa.victor.go4lunch.BuildConfig;
 import com.khamvongsa.victor.go4lunch.R;
-import com.khamvongsa.victor.go4lunch.model.NearbyRestaurant;
+import com.khamvongsa.victor.go4lunch.model.NearbyRestaurantPOJO;
 import com.khamvongsa.victor.go4lunch.ui.MainActivity;
 import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
 
@@ -317,12 +317,12 @@ public class MapViewFragment extends Fragment {
 
     private void executeHttpRequestWithRetrofit(Location lastKnownLocation){
         String location = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
-        this.disposable = MapAPIStream.streamFetchNearbyRestaurant(location).subscribeWith(new DisposableObserver<NearbyRestaurant>() {
+        this.disposable = MapAPIStream.streamFetchNearbyRestaurant(location).subscribeWith(new DisposableObserver<NearbyRestaurantPOJO>() {
             @Override
-            public void onNext(@NotNull NearbyRestaurant restaurants) {
+            public void onNext(@NotNull NearbyRestaurantPOJO restaurants) {
                 // 6 - Update RecyclerView after getting results from Googlemap API
                 mMap.clear();
-                for (NearbyRestaurant.PlaceResults r : restaurants.getPlaceResults()) {
+                for (NearbyRestaurantPOJO.PlaceResults r : restaurants.getPlaceResults()) {
                     double lat = r.getGeometry().getLocation().getLat();
                     double lng = r.getGeometry().getLocation().getLng();
                     String name = r.getName();

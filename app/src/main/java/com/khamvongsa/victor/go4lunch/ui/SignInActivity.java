@@ -12,6 +12,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.khamvongsa.victor.go4lunch.R;
+import com.khamvongsa.victor.go4lunch.manager.UserManager;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 
 import java.util.Arrays;
@@ -27,6 +28,8 @@ import androidx.appcompat.app.AppCompatActivity;
 public class SignInActivity extends AppCompatActivity {
 
     // SIGN IN
+    private UserManager userManager = UserManager.getInstance();
+
 
     // See: https://developer.android.com/training/basics/intents/result
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
@@ -72,7 +75,7 @@ public class SignInActivity extends AppCompatActivity {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == RESULT_OK) {
             // Successfully signed in
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            userManager.createUser();
             showSnackBar(getString(R.string.connection_succeed));
             NavigationHelper.launchNewActivity(SignInActivity.this, MainActivity.class);
 

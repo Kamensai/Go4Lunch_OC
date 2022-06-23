@@ -32,6 +32,7 @@ android {
 }
 
 // TODO: Vérifier avec François la dernière version sdk facebook
+// TODO : demander si la facturation de mon compte firebase est obligatoire.
 
 dependencies {
 
@@ -39,8 +40,15 @@ dependencies {
     implementation 'com.google.android.material:material:1.5.0-alpha02'
 
     // FIREBASE
+    implementation platform('com.google.firebase:firebase-bom:29.3.0')
     implementation 'com.firebaseui:firebase-ui-auth:8.0.0'
     implementation 'com.facebook.android:facebook-android-sdk:8.1.0'
+
+    // FIREBASE FIRESTORE
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.firebaseui:firebase-ui-firestore:7.1.1'
+    implementation 'com.firebaseui:firebase-ui-storage:7.1.1'
+
 
     implementation 'androidx.navigation:navigation-fragment:2.3.1'
     implementation 'androidx.navigation:navigation-ui:2.3.1'

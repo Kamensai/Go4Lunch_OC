@@ -1,7 +1,7 @@
 package com.khamvongsa.victor.go4lunch.utils;
 
 import com.khamvongsa.victor.go4lunch.BuildConfig;
-import com.khamvongsa.victor.go4lunch.model.NearbyRestaurant;
+import com.khamvongsa.victor.go4lunch.model.NearbyRestaurantPOJO;
 
 import java.util.concurrent.TimeUnit;
 
@@ -14,7 +14,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class MapAPIStream {
 
-    public static Observable<NearbyRestaurant> streamFetchNearbyRestaurant(String location){
+    public static Observable<NearbyRestaurantPOJO> streamFetchNearbyRestaurant(String location){
         MapAPIService mapAPIService = MapAPIService.retrofit.create(MapAPIService.class);
         return mapAPIService.getNearby(location, "restaurant", 200, BuildConfig.MAPS_API_KEY)
                 .subscribeOn(Schedulers.io())

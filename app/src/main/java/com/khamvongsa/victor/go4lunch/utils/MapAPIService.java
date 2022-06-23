@@ -1,6 +1,6 @@
 package com.khamvongsa.victor.go4lunch.utils;
 
-import com.khamvongsa.victor.go4lunch.model.NearbyRestaurant;
+import com.khamvongsa.victor.go4lunch.model.NearbyRestaurantPOJO;
 
 import io.reactivex.Observable;
 import retrofit2.Retrofit;
@@ -14,14 +14,16 @@ import retrofit2.http.Query;
  */
 public interface MapAPIService {
     @GET("place/nearbysearch/json?")
-    Observable<NearbyRestaurant>getNearby(@Query("location") String location,
-                                          @Query("type") String type,
-                                          @Query("radius") int radius,
-                                          @Query("key") String key);
+    Observable<NearbyRestaurantPOJO>getNearby(@Query("location") String location,
+                                              @Query("type") String type,
+                                              @Query("radius") int radius,
+                                              @Query("key") String key);
 
     public static final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("https://maps.googleapis.com/maps/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build();
+
+
 }

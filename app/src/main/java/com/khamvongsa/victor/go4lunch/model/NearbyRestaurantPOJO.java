@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by <Victor Khamvongsa> on <11/05/2022>
  */
-public class NearbyRestaurant {
+public class NearbyRestaurantPOJO {
 
     @SerializedName("html_attributions")
     @Expose
