@@ -1,6 +1,5 @@
 package com.khamvongsa.victor.go4lunch.ui;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import com.khamvongsa.victor.go4lunch.R;

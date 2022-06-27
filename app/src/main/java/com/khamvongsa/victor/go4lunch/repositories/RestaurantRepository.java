@@ -106,8 +106,8 @@ public final class RestaurantRepository {
             return null;
         }
     }
-    // Help StackOverflow : https://stackoverflow.com/questions/52537965/how-can-i-get-data-from-array-data-field-from-cloud-firestore
-    // https://stackoverflow.com/questions/46757614/how-to-update-an-array-of-objects-with-firestore
+    // TODO : Vérifier Help StackOverflow : https://stackoverflow.com/questions/52537965/how-can-i-get-data-from-array-data-field-from-cloud-firestore
+    //  https://stackoverflow.com/questions/46757614/how-to-update-an-array-of-objects-with-firestore
     public Task<DocumentSnapshot> getUsersEatingList(String restaurantId) {
         return this.getRestaurantCollection().document(restaurantId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -124,7 +124,7 @@ public final class RestaurantRepository {
         });
     }
 
-    // Help from StackOverflow : https://stackoverflow.com/questions/68160074/how-do-i-insert-data-in-firestore-in-array-of-string
+    // TODO : Vérifier Help from StackOverflow : https://stackoverflow.com/questions/68160074/how-do-i-insert-data-in-firestore-in-array-of-string
     // Add UsersEatingToArray
     public Task<Void> addUsersEating(String restaurantId) {
         String uid = userManager.getCurrentUser().getUid();

@@ -1,6 +1,7 @@
 package com.khamvongsa.victor.go4lunch.ui.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -26,6 +28,7 @@ import com.khamvongsa.victor.go4lunch.BuildConfig;
 import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.model.NearbyRestaurantPOJO;
 import com.khamvongsa.victor.go4lunch.ui.MainActivity;
+import com.khamvongsa.victor.go4lunch.ui.RestaurantActivity;
 import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
 
 import org.jetbrains.annotations.NotNull;
@@ -110,6 +113,17 @@ public class MapViewFragment extends Fragment {
                 updateLocationUI();
 
                 getDeviceLocation();
+
+                // TODO : A récupérer les données et les ransférer à Restaurant Activity
+                //  https://stackoverflow.com/questions/42950845/sending-data-through-infowindow-to-another-activity-android
+                mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+                        Intent intent = new Intent(getContext(), RestaurantActivity.class);
+                        startActivity(intent);
+
+                    }
+                });
 
                 // showNearPlaces();
             }
@@ -351,7 +365,5 @@ public class MapViewFragment extends Fragment {
         super.onDestroy();
         this.disposeWhenDestroy();
     }
-
-
 
 }
