@@ -21,11 +21,11 @@ public class Restaurant {
     private String phone;
     private String type;
     private int usersEatingCount;
-    private int usersLikingCount;
+    private Number usersLikingCount;
     private Boolean favorite;
     private Boolean openingHours;
-    private List<User> usersEatingList;
-    private List<User> usersLikingList;
+    private List<String> usersEatingList;
+    private List<String> usersLikingList;
 
     public Restaurant() { }
 
@@ -86,13 +86,13 @@ public class Restaurant {
 
     public Boolean getOpeningHours() { return openingHours; }
 
-    public List<User> getUsersEatingList() { return usersEatingList; }
+    public List<String> getUsersEatingList() { return usersEatingList; }
 
     public int getUsersEatingCount() { return usersEatingCount; }
 
-    public int getUsersLikingCount() { return usersLikingCount; }
+    public Number getUsersLikingCount() { return usersLikingCount; }
 
-    public List<User> getUsersLikingList() { return usersLikingList; }
+    public List<String> getUsersLikingList() { return usersLikingList; }
 
     // --- SETTERS ---
 
@@ -118,11 +118,11 @@ public class Restaurant {
 
     public void setOpeningHours(Boolean openingHours) { this.openingHours = openingHours; }
 
-    public void setUsersEatingList(List<User> usersEatingList) { this.usersEatingList = usersEatingList; }
+    public void setUsersEatingList(List<String> usersEatingList) { this.usersEatingList = usersEatingList; }
 
     public void setUsersEatingCount(int usersEatingCount) { this.usersEatingCount = usersEatingCount; }
 
-    public void setUsersLikingList(List<User> usersLikingList) { this.usersLikingList = usersLikingList; }
+    public void setUsersLikingList(List<String> usersLikingList) { this.usersLikingList = usersLikingList; }
 
-    public void setUsersLikingCount(int usersLikingCount) { this.usersLikingCount = usersLikingCount; }
+    public void setUsersLikingCount(Number usersLikingCount) { this.usersLikingCount = usersLikingCount; }
 }

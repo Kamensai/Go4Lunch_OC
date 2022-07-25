@@ -1,9 +1,10 @@
 package com.khamvongsa.victor.go4lunch.manager;
 
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.Query;
 import com.khamvongsa.victor.go4lunch.repositories.RestaurantRepository;
+
+import java.util.ArrayList;
 
 /**
  * Created by <Victor Khamvongsa> on <30/05/2022>
@@ -67,12 +68,17 @@ public class RestaurantManager {
         return restaurantRepository.addUsersLiking(restaurantId);
     }
 
-    // Add UsersEatingCount
+    // Remove UsersLikingFromArray
+    public Task<Void> removeUsersLiking(String restaurantId) {
+        return restaurantRepository.removeUsersLiking(restaurantId);
+    }
+
+    // Add UsersLikingCount
     public Task<Void> addUsersLikingCount(String restaurantId) {
         return restaurantRepository.addUsersLikingCount(restaurantId);
     }
 
-    // Decrease UsersEatingCount
+    // Decrease UsersLikingCount
     public Task<Void> decreaseUsersLikingCount(String restaurantId) {
         return restaurantRepository.decreaseUsersLikingCount(restaurantId);
     }

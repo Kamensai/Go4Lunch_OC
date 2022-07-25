@@ -36,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -69,6 +70,8 @@ public class MapViewFragment extends Fragment {
     // [START maps_current_place_state_keys]
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
+    private static final String KEY_PLACE_ID = "placeId";
+
     // [END maps_current_place_state_keys]
 
     // Used for selecting the current place.
@@ -110,16 +113,29 @@ public class MapViewFragment extends Fragment {
 
                 getLocationPermission();
 
+                getDeviceLocation();
+
                 updateLocationUI();
 
-                getDeviceLocation();
+                mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                    @Override
+                    public boolean onMyLocationButtonClick() {
+                        getDeviceLocation();
+                        return true;
+                    }
+                });
 
                 // TODO : A récupérer les données et les ransférer à Restaurant Activity
                 //  https://stackoverflow.com/questions/42950845/sending-data-through-infowindow-to-another-activity-android
                 mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                     @Override
-                    public void onInfoWindowClick(Marker marker) {
+                    public void onInfoWindowClick(@NotNull Marker marker) {
+                        String placeId = (String) marker.getTag();
                         Intent intent = new Intent(getContext(), RestaurantActivity.class);
+                        Intent mDetailsRestaurantFragment = new Intent(getContext(), DetailsRestaurantFragment.class);
+                        mDetailsRestaurantFragment.putExtra(KEY_PLACE_ID, placeId);
+                        Log.i(TAG, placeId);
+                        intent.putExtra(KEY_PLACE_ID, placeId);
                         startActivity(intent);
 
                     }
@@ -340,11 +356,15 @@ public class MapViewFragment extends Fragment {
                     double lat = r.getGeometry().getLocation().getLat();
                     double lng = r.getGeometry().getLocation().getLng();
                     String name = r.getName();
-                    MarkerOptions markerOptions = new MarkerOptions();
+                    String restaurantId = r.getPlaceId();
                     LatLng latLng = new LatLng(lat, lng);
-                    markerOptions.position(latLng);
-                    markerOptions.title(name);
-                    mMap.addMarker(markerOptions);
+                    Marker marker = mMap.addMarker(new MarkerOptions()
+                            .position(latLng)
+                            .title(name));
+                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon)));
+                    // TODO : changer le visuel
+                    assert marker != null;
+                    marker.setTag(restaurantId);
                 }
             }
 
