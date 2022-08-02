@@ -1,5 +1,7 @@
 package com.khamvongsa.victor.go4lunch.model;
 
+import com.google.firebase.firestore.DocumentReference;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,11 +22,11 @@ public class Restaurant {
     private String website;
     private String phone;
     private String type;
-    private int usersEatingCount;
+    private Number usersEatingCount;
     private Number usersLikingCount;
     private Boolean favorite;
     private Boolean openingHours;
-    private List<String> usersEatingList;
+    private List<DocumentReference> usersEatingList;
     private List<String> usersLikingList;
 
     public Restaurant() { }
@@ -86,9 +88,9 @@ public class Restaurant {
 
     public Boolean getOpeningHours() { return openingHours; }
 
-    public List<String> getUsersEatingList() { return usersEatingList; }
+    public List<DocumentReference> getUsersEatingList() { return usersEatingList; }
 
-    public int getUsersEatingCount() { return usersEatingCount; }
+    public Number getUsersEatingCount() { return usersEatingCount; }
 
     public Number getUsersLikingCount() { return usersLikingCount; }
 
@@ -118,9 +120,9 @@ public class Restaurant {
 
     public void setOpeningHours(Boolean openingHours) { this.openingHours = openingHours; }
 
-    public void setUsersEatingList(List<String> usersEatingList) { this.usersEatingList = usersEatingList; }
+    public void setUsersEatingList(List<DocumentReference> usersEatingList) { this.usersEatingList = usersEatingList; }
 
-    public void setUsersEatingCount(int usersEatingCount) { this.usersEatingCount = usersEatingCount; }
+    public void setUsersEatingCount(Number usersEatingCount) { this.usersEatingCount = usersEatingCount; }
 
     public void setUsersLikingList(List<String> usersLikingList) { this.usersLikingList = usersLikingList; }
 

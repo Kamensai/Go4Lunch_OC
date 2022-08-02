@@ -2,6 +2,8 @@ package com.khamvongsa.victor.go4lunch.ui;
 
 import android.util.Log;
 
+import com.khamvongsa.victor.go4lunch.model.User;
+import com.khamvongsa.victor.go4lunch.model.UserStateItem;
 import com.khamvongsa.victor.go4lunch.repositories.RestaurantRepository;
 
 import java.util.ArrayList;
@@ -19,11 +21,7 @@ public class RestaurantViewModel extends ViewModel {
 
     private static final String TAG = RestaurantViewModel.class.getSimpleName();
 
-
     private final RestaurantRepository mRestaurantRepository;
-
-    private final MutableLiveData<List<String>> updateUsersLikingListId = new MutableLiveData<>();
-
 
     public RestaurantViewModel() {
         mRestaurantRepository = RestaurantRepository.getInstance();
@@ -43,8 +41,21 @@ public class RestaurantViewModel extends ViewModel {
 
  */
 
-    public LiveData<List<String>> getAllUsersIdLikeList() {
-        return mapDataToStringList(mRestaurantRepository.getAllUsersLikingListId());
+    //Mapping data from remote source to view data, ask to your mentor to know why it is important to do so
+    private LiveData<List<UserStateItem>> mapUserDataToViewState(LiveData<List<User>> users) {
+        return Transformations.map(users, user -> {
+            List<UserStateItem> userViewStateItems = new ArrayList<>();
+            if (user != null){
+                for (User u : user) {
+                    userViewStateItems.add(
+                            new UserStateItem(u)
+                    );
+                }
+            }else {
+                Log.e(TAG, "UserLikingList null " );
+            }
+            return userViewStateItems;
+        });
     }
 
     private LiveData<List<String>> mapDataToStringList(LiveData<List<String>> usersId) {
@@ -55,39 +66,30 @@ public class RestaurantViewModel extends ViewModel {
                     usersIdList.add(uid);
                 }
             } else {
-                Log.e(TAG, "List null " );
+                Log.e(TAG, "UserLikingList null " );
             }
             return usersIdList;
         });
     }
 
+    public LiveData<List<String>> getAllUsersLikeIdList() {
+        return mapDataToStringList(mRestaurantRepository.getAllUsersLikingIdListMutableLiveData());
+    }
 
-    public void getUsersLikingListId(String restaurantId) {
+    public void getUsersLikingIdList(String restaurantId) {
         mRestaurantRepository.getUsersLikingListId(restaurantId);
     }
+
+    public LiveData<List<UserStateItem>> getAllUsersEatingList() {
+        return mapUserDataToViewState(mRestaurantRepository.getAllUsersEatingListMutableLiveData());
+    }
+
+    public void getUsersEatingList(String restaurantId) {
+        mRestaurantRepository.getUsersEatingList(restaurantId);
+    }
+
+
 /*
-    public LiveData<List<String>> getUsersLikingListIdLiveData() {
-        return updateUsersLikingListId ;
-
-    }
-
-     */
-
-    //Mapping data from remote source to view data, ask to your mentor to know why it is important to do so
-    /*
-    private LiveData<List<FreelanceStateItem>> mapDataToViewState(LiveData<List<Freelance>> freelances) {
-        return Transformations.map(freelances, freelance -> {
-            List<FreelanceStateItem> freelanceViewStateItems = new ArrayList<>();
-            for (Freelance f : freelance) {
-                freelanceViewStateItems.add(
-                        new FreelanceStateItem(f)
-                );
-            }
-            return freelanceViewStateItems;
-        });
-    }
-
-
     public LiveData<List<FreelanceStateItem>> getAllFreelances() {
         return mapDataToViewState(repository.getAllFreelances());
     }

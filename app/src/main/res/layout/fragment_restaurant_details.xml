@@ -115,7 +115,7 @@
 
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/activity_restaurant_selected_ActionButton"
+            android:id="@+id/activity_restaurant_chosen_ActionButton"
             android:layout_width="59dp"
             android:layout_height="56dp"
             android:layout_marginEnd="15dp"

@@ -4,8 +4,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.Query;
 import com.khamvongsa.victor.go4lunch.repositories.RestaurantRepository;
 
-import java.util.ArrayList;
-
 /**
  * Created by <Victor Khamvongsa> on <30/05/2022>
  */
@@ -32,11 +30,15 @@ public class RestaurantManager {
     }
 
     public Query getAllRestaurants(){
-        return restaurantRepository.getAllRestaurants();
+        return restaurantRepository.getAllRestaurantsLiked();
     }
 
     public void createRestaurant(String restaurantId, String name){
-        restaurantRepository.createRestaurant(restaurantId, name);
+        restaurantRepository.createRestaurantLiked(restaurantId, name);
+    }
+
+    public void createChosenRestaurant(String restaurantId, String name){
+        restaurantRepository.createReferenceToRestaurantChosen(restaurantId, name);
     }
 
     public void getUsersEatingList(String restaurantId) {

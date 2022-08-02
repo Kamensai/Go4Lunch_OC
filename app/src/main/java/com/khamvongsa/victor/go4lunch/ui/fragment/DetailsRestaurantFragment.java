@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,8 +20,11 @@ import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.manager.RestaurantManager;
 import com.khamvongsa.victor.go4lunch.manager.UserManager;
 import com.khamvongsa.victor.go4lunch.model.DetailRestaurantPOJO;
+import com.khamvongsa.victor.go4lunch.model.User;
+import com.khamvongsa.victor.go4lunch.model.UserStateItem;
 import com.khamvongsa.victor.go4lunch.ui.FactoryViewModel;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantViewModel;
+import com.khamvongsa.victor.go4lunch.ui.views.DetailsRestaurantAdapter;
 import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,10 +32,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
@@ -45,6 +52,7 @@ public class DetailsRestaurantFragment extends Fragment {
     private UserManager mUserManager = UserManager.getInstance();
     private RestaurantManager mRestaurantManager = RestaurantManager.getInstance();
     private RestaurantViewModel mRestaurantViewModel;
+    private DetailsRestaurantAdapter mDetailsRestaurantAdapter;
 
     private static final String USERS_LIKING_LIST_FIELD = "usersLikingList";
     private static final String KEY_PLACE_ID = "placeId";
@@ -54,15 +62,19 @@ public class DetailsRestaurantFragment extends Fragment {
     private Boolean mRestaurantIsLiked;
     private String mUserId;
     private List<String> mUsersLikingList = new ArrayList<>();
+    private List<UserStateItem> mUsersEatingList = new ArrayList<>();
 
     private Disposable disposable;
 
-    TextView restaurantName;
-    TextView restaurantAddress;
-    ImageView restaurantImage;
-    TextView restaurantPhone;
-    TextView restaurantLikes;
-    TextView restaurantWebsite;
+    View mRootView;
+
+    TextView mRestaurantName;
+    TextView mRestaurantAddress;
+    ImageView mRestaurantImage;
+    TextView mRestaurantPhone;
+    TextView mRestaurantLikes;
+    TextView mRestaurantWebsite;
+    ImageButton mRestaurantChosenButton;
 
     public DetailsRestaurantFragment() { }
 
@@ -74,18 +86,22 @@ public class DetailsRestaurantFragment extends Fragment {
         mUserId = mUserManager.getCurrentUser().getUid();
         showPlaceId(mUserId);
         mRestaurantViewModel = new ViewModelProvider(this, FactoryViewModel.getInstance()).get(RestaurantViewModel.class);
+        mDetailsRestaurantAdapter = new DetailsRestaurantAdapter();
         executeHttpRequestWithRetrofit(mPlaceId);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        return inflater.inflate(R.layout.fragment_restaurant_details, container, false);
+        mRootView = inflater.inflate(R.layout.fragment_restaurant_details, container, false);
+        RecyclerView recyclerView = mRootView.findViewById(R.id.activity_restaurant_list_workmates);
+        recyclerView.setAdapter(mDetailsRestaurantAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        getUsersEatingList();
+        return mRootView;
     }
 
     public void showPlaceId (String placeId){
         Toast.makeText(getContext(), placeId + " Is  your placeId!", Toast.LENGTH_SHORT).show();
-
     }
 
     // This event is triggered soon after onCreateView().
@@ -96,28 +112,36 @@ public class DetailsRestaurantFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        restaurantName = view.findViewById(R.id.activity_restaurant_name);
-        restaurantAddress = view.findViewById(R.id.activity_restaurant_address);
-        restaurantImage = view.findViewById(R.id.activity_restaurant_image);
-        restaurantPhone = view.findViewById(R.id.activity_restaurant_phone);
-        restaurantLikes = view.findViewById(R.id.activity_restaurant_like);
-        restaurantWebsite = view.findViewById(R.id.activity_restaurant_website);
 
+        mRestaurantName = view.findViewById(R.id.activity_restaurant_name);
+        mRestaurantAddress = view.findViewById(R.id.activity_restaurant_address);
+        mRestaurantImage = view.findViewById(R.id.activity_restaurant_image);
+        mRestaurantPhone = view.findViewById(R.id.activity_restaurant_phone);
+        mRestaurantLikes = view.findViewById(R.id.activity_restaurant_like);
+        mRestaurantWebsite = view.findViewById(R.id.activity_restaurant_website);
+        mRestaurantChosenButton = view.findViewById(R.id.activity_restaurant_chosen_ActionButton);
 
         //lv.setAdapter(adapter);
+    }
+
+    private void getUsersEatingList() {
+        mRestaurantViewModel.getAllUsersEatingList().observe(requireActivity(), mDetailsRestaurantAdapter::submitList);
+    }
+    private void getWorkmatesList(){
+
     }
 
     private void executeHttpRequestWithRetrofit(String placeId){
         this.disposable = MapAPIStream.streamFetchDetailRestaurant(placeId).subscribeWith(new DisposableObserver<DetailRestaurantPOJO>() {
             @Override
             public void onNext(@NotNull DetailRestaurantPOJO restaurant) {
-                restaurantName.setText(restaurant.getResult().getName());
-                restaurantAddress.setText(restaurant.getResult().getFormattedAddress());
+                mRestaurantName.setText(restaurant.getResult().getName());
+                mRestaurantAddress.setText(restaurant.getResult().getFormattedAddress());
                 setRestaurantPhoto(restaurant);
                 //TODO aide https://stackoverflow.com/questions/9703447/phone-call-on-textview-click
-                restaurantPhone.setCompoundDrawablesWithIntrinsicBounds(null,getResources().getDrawable(R.drawable.ic_phone),null,null);
-                restaurantPhone.setText(R.string.call);
-                restaurantPhone.setOnClickListener(new View.OnClickListener() {
+                mRestaurantPhone.setCompoundDrawablesWithIntrinsicBounds(null,getResources().getDrawable(R.drawable.ic_phone),null,null);
+                mRestaurantPhone.setText(R.string.call);
+                mRestaurantPhone.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (restaurant.getResult().getFormattedPhoneNumber() != null) {
@@ -138,9 +162,9 @@ public class DetailsRestaurantFragment extends Fragment {
                     }
                 });
 
-                restaurantWebsite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_website),null,null);
-                restaurantWebsite.setText(R.string.website);
-                restaurantWebsite.setOnClickListener(new View.OnClickListener() {
+                mRestaurantWebsite.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_website),null,null);
+                mRestaurantWebsite.setText(R.string.website);
+                mRestaurantWebsite.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (restaurant.getResult().getWebsite() != null){
@@ -156,16 +180,25 @@ public class DetailsRestaurantFragment extends Fragment {
                 });
 
                 updateLikeButtonOnStart();
-                restaurantLikes.setText(R.string.like);
-                restaurantLikes.setOnClickListener(new View.OnClickListener() {
+                mRestaurantLikes.setText(R.string.like);
+                mRestaurantLikes.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         updateLikeButtonOnClick();
                         mRestaurantManager.createRestaurant(placeId,restaurant.getResult().getName());
-
                     }
                 });
-                mRestaurantViewModel.getUsersLikingListId(mPlaceId);
+                mRestaurantViewModel.getUsersLikingIdList(mPlaceId);
+
+                updateEatButtonOnStart();
+                mRestaurantChosenButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        updateEatButtonOnClick();
+                        mRestaurantManager.createChosenRestaurant(placeId, restaurant.getResult().getName());
+                    }
+                });
+                mRestaurantViewModel.getUsersEatingList(mPlaceId);
             }
 
             @Override
@@ -178,39 +211,40 @@ public class DetailsRestaurantFragment extends Fragment {
         });
     }
 
+    // USER LIKE RESTAURANT
+
     // TODO : Help from https://stackoverflow.com/questions/54604602/how-to-obtain-simple-listt-from-android-livedatalistt
-    //app:drawableTopCompat="@drawable/ic_like"
 
     public void updateLikeButtonOnStart(){
-        mRestaurantViewModel.getAllUsersIdLikeList().observe(requireActivity(), new Observer<List<String>>() {
+        mRestaurantViewModel.getAllUsersLikeIdList().observe(requireActivity(), new Observer<List<String>>() {
             @SuppressLint("UseCompatLoadingForDrawables")
             @Override
             public void onChanged(List<String> userIdList) {
                 mUsersLikingList= userIdList;
                 if(userLikeRestaurant(mUsersLikingList)){
                     Log.e(TAG, "user found at start");
-                    restaurantLikes.setCompoundDrawablesWithIntrinsicBounds(null,getResources().getDrawable(R.drawable.ic_like),null,null);
+                    mRestaurantLikes.setCompoundDrawablesWithIntrinsicBounds(null,getResources().getDrawable(R.drawable.ic_like),null,null);
                 }else{
                     Log.e(TAG, "user not found at start");
-                    restaurantLikes.setCompoundDrawablesWithIntrinsicBounds(null,getResources().getDrawable(R.drawable.ic_like_empty),null,null);
+                    mRestaurantLikes.setCompoundDrawablesWithIntrinsicBounds(null,getResources().getDrawable(R.drawable.ic_like_empty),null,null);
                 }
             }
         });
     }
 
-
+    @SuppressLint("UseCompatLoadingForDrawables")
     public void updateLikeButtonOnClick(){
         if(userLikeRestaurant(mUsersLikingList)){
             Log.e(TAG, "List when user found" + mUsersLikingList.toString());
             mRestaurantManager.removeUsersLiking(mPlaceId);
             mRestaurantManager.decreaseUsersLikingCount(mPlaceId);
-            restaurantLikes.setCompoundDrawablesWithIntrinsicBounds(null,getResources().getDrawable(R.drawable.ic_like_empty),null,null);
+            mRestaurantLikes.setCompoundDrawablesWithIntrinsicBounds(null,getResources().getDrawable(R.drawable.ic_like_empty),null,null);
             Log.e(TAG, "User deleted");
         }else{
             Log.e(TAG, "List when user not found" + mUsersLikingList.toString());
             mRestaurantManager.addUsersLiking(mPlaceId);
             mRestaurantManager.addUsersLikingCount(mPlaceId);
-            restaurantLikes.setCompoundDrawablesWithIntrinsicBounds(null,getResources().getDrawable(R.drawable.ic_like),null,null);
+            mRestaurantLikes.setCompoundDrawablesWithIntrinsicBounds(null,getResources().getDrawable(R.drawable.ic_like),null,null);
             Log.e(TAG, "Adding user");
         }
     }
@@ -228,11 +262,61 @@ public class DetailsRestaurantFragment extends Fragment {
         return userLike;
     }
 
+    // USER EAT TO RESTAURANT
+
+    public void updateEatButtonOnStart(){
+        mRestaurantViewModel.getAllUsersEatingList().observe(requireActivity(), new Observer<List<UserStateItem>>() {
+            @SuppressLint("UseCompatLoadingForDrawables")
+            @Override
+            public void onChanged(List<UserStateItem> userEatingList) {
+                mUsersEatingList= userEatingList;
+                if(userEatAtRestaurant(mUsersEatingList)){
+                    Log.e(TAG, "userEating found at start" + mUsersEatingList.get(0).getUsername());
+                    mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like));
+                }else{
+                    Log.e(TAG, "userEating not found at start");
+                    mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_empty));
+                }
+            }
+        });
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    public void updateEatButtonOnClick(){
+        if(userEatAtRestaurant(mUsersEatingList)){
+            Log.e(TAG, "List when userEating found" + mUsersEatingList.toString());
+            mRestaurantManager.removeUsersEating(mPlaceId);
+            mRestaurantManager.decreaseUsersEatingCount(mPlaceId);
+            mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_empty));
+            Log.e(TAG, "UserEating deleted");
+        }else{
+            Log.e(TAG, "List when userEating not found" + mUsersEatingList.toString());
+            mRestaurantManager.addUsersEating(mPlaceId);
+            mRestaurantManager.addUsersEatingCount(mPlaceId);
+            mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like));
+            Log.e(TAG, "Adding userEating");
+        }
+    }
+
+    public Boolean userEatAtRestaurant(List<UserStateItem> listUsersEatingRestaurant){
+        boolean userLike = false;
+        if (listUsersEatingRestaurant != null && listUsersEatingRestaurant.size() > 0){
+            for (UserStateItem userEating : listUsersEatingRestaurant){
+                if (userEating.getUid().trim().contains(mUserId)){
+                    userLike = true;
+                    break;
+                }
+            }
+        }
+        return userLike;
+    }
+
+    // PHOTO
     private void setRestaurantPhoto (DetailRestaurantPOJO restaurant){
         if (restaurant.getResult().getPhotos() != null) {
             mPhotoReference = restaurant.getResult().getPhotos().get(0).getPhotoReference();
             Log.e(TAG, mPhotoReference);
-            Glide.with(restaurantImage.getContext()).load(MapAPIStream.getImageUrl(mPhotoReference)).into(restaurantImage);
+            Glide.with(mRestaurantImage.getContext()).load(MapAPIStream.getImageUrl(mPhotoReference)).into(mRestaurantImage);
         }
     }
 
