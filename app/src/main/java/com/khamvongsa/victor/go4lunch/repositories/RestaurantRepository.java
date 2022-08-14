@@ -52,6 +52,8 @@ public final class RestaurantRepository {
 
     private final MutableLiveData<List<String>> mListOfUsersLikingIdRestaurant = new MutableLiveData<>();
 
+    private String mIdOfOtherRestaurant = "null";
+
 
     private static volatile RestaurantRepository instance;
 
@@ -129,6 +131,12 @@ public final class RestaurantRepository {
         }
     }
 
+    public Task<QuerySnapshot> getRestaurantUserIsEatingAt(){
+        String uid = userManager.getCurrentUser().getUid();
+        DocumentReference userDocRef = getUsersCollection().document(uid);
+        return getRestaurantToEatCollection().whereArrayContains(USERS_EATING_LIST_FIELD, userDocRef).get();
+    }
+
     public Task<DocumentSnapshot> getRestaurantLikedData(String restaurantId) {
         if(restaurantId != null){
             return this.getRestaurantLikedCollection().document(restaurantId).get();
@@ -151,7 +159,6 @@ public final class RestaurantRepository {
 
     public Task<QuerySnapshot> getRestaurantToEat(){
             return this.getRestaurantToEatCollection().get();
-
     }
 
     public DocumentReference getRestaurantLikedDoc(String restaurantId){
@@ -177,6 +184,33 @@ public final class RestaurantRepository {
     public MutableLiveData<List<User>> getAllUsersEatingListMutableLiveData() {
         return mListOfUsersEatingRestaurant;
     }
+
+    public void deleteUserEatingAtOtherRestaurant(String restaurantIdClickedOn){
+        this.getRestaurantUserIsEatingAt().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        String restaurantIdOfOtherRestaurant = document.getId();
+                        if (!restaurantIdClickedOn.equals(restaurantIdOfOtherRestaurant)){
+                            decreaseUsersEatingCount(restaurantIdOfOtherRestaurant);
+                            removeUsersEating(restaurantIdOfOtherRestaurant);
+                        }
+                    }
+                } else {
+                    Log.d("Error", "Error getting documents: ", task.getException());
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                //handle error
+                Log.d(TAG, "Error getting documents: RestaurantUserIsEatingAt ");
+            }
+        });
+    }
+
+
 
     // TODO : help from https://firebase.google.com/docs/firestore/query-data/listen
     @SuppressWarnings("unchecked")
@@ -233,6 +267,8 @@ public final class RestaurantRepository {
     //  https://stackoverflow.com/questions/46757614/how-to-update-an-array-of-objects-with-firestore
 
     // TODO : Faire comme dans l'application FreelanceFinder pour récupérer l'objet à partir de la référence.
+    // TODO : Help from https://stackoverflow.com/questions/68919182/how-to-access-array-data-from-firebase-firestore
+
     @SuppressWarnings("unchecked")
     public void getUsersEatingList(String restaurantId) {
         this.getRestaurantEatingDoc(restaurantId).addSnapshotListener(new EventListener<DocumentSnapshot>(){
@@ -275,29 +311,6 @@ public final class RestaurantRepository {
         });
     }
 
-    // TODO : Help from https://stackoverflow.com/questions/68919182/how-to-access-array-data-from-firebase-firestore
-    @SuppressWarnings("unchecked")
-    public void updateUsersLikingList(String restaurantId) {
-        this.getRestaurantLikedData(restaurantId).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        List<String> usersLikingRestaurantListId = (List<String>) document.get(USERS_LIKING_LIST_FIELD);
-                        if (usersLikingRestaurantListId != null) {
-                            //mUserLikingList.addAll(usersLikingRestaurantListId);
-                        }
-                    } else {
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
-    }
-
     // TODO : Vérifier Help from StackOverflow : https://stackoverflow.com/questions/51292378/how-do-you-insert-a-reference-value-into-firestore
     //  https://stackoverflow.com/questions/50722942/firestore-how-create-documentreference-using-path-string
     //  https://stackoverflow.com/questions/68160074/how-do-i-insert-data-in-firestore-in-array-of-string
@@ -306,6 +319,7 @@ public final class RestaurantRepository {
         String uid = userManager.getCurrentUser().getUid();
         DocumentReference userDocRef = getUsersCollection().document(uid);
         if(restaurantId != null){
+            Log.e(TAG, "Adding userEating");
             return this.getRestaurantToEatCollection().document(restaurantId).update(USERS_EATING_LIST_FIELD, FieldValue.arrayUnion(userDocRef));
         }else{
             return null;
@@ -317,6 +331,7 @@ public final class RestaurantRepository {
         String uid = userManager.getCurrentUser().getUid();
         DocumentReference userDocRef = getUsersCollection().document(uid);
         if(restaurantId != null){
+            Log.e(TAG, "UserEating deleted");
             return this.getRestaurantToEatCollection().document(restaurantId).update(USERS_EATING_LIST_FIELD, FieldValue.arrayRemove(userDocRef));
         }else{
             return null;

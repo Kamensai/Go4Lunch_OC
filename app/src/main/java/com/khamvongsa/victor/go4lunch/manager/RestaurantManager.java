@@ -45,6 +45,10 @@ public class RestaurantManager {
         restaurantRepository.getUsersEatingList(restaurantId);
     }
 
+    public void deleteUserEatingAtOtherRestaurant(String restaurantId){
+        restaurantRepository.deleteUserEatingAtOtherRestaurant(restaurantId);
+    }
+
     // Add UsersEatingToArray
     public Task<Void> addUsersEating(String restaurantId) {
         return restaurantRepository.addUsersEating(restaurantId);

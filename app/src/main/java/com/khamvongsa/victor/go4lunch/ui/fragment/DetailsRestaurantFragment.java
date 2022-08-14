@@ -112,7 +112,6 @@ public class DetailsRestaurantFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         mRestaurantName = view.findViewById(R.id.activity_restaurant_name);
         mRestaurantAddress = view.findViewById(R.id.activity_restaurant_address);
         mRestaurantImage = view.findViewById(R.id.activity_restaurant_image);
@@ -121,14 +120,10 @@ public class DetailsRestaurantFragment extends Fragment {
         mRestaurantWebsite = view.findViewById(R.id.activity_restaurant_website);
         mRestaurantChosenButton = view.findViewById(R.id.activity_restaurant_chosen_ActionButton);
 
-        //lv.setAdapter(adapter);
     }
 
     private void getUsersEatingList() {
         mRestaurantViewModel.getAllUsersEatingList().observe(requireActivity(), mDetailsRestaurantAdapter::submitList);
-    }
-    private void getWorkmatesList(){
-
     }
 
     private void executeHttpRequestWithRetrofit(String placeId){
@@ -185,7 +180,7 @@ public class DetailsRestaurantFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         updateLikeButtonOnClick();
-                        mRestaurantManager.createRestaurant(placeId,restaurant.getResult().getName());
+                        mRestaurantManager.createRestaurant(mPlaceId,restaurant.getResult().getName());
                     }
                 });
                 mRestaurantViewModel.getUsersLikingIdList(mPlaceId);
@@ -195,7 +190,7 @@ public class DetailsRestaurantFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         updateEatButtonOnClick();
-                        mRestaurantManager.createChosenRestaurant(placeId, restaurant.getResult().getName());
+                        mRestaurantManager.createChosenRestaurant(mPlaceId, restaurant.getResult().getName());
                     }
                 });
                 mRestaurantViewModel.getUsersEatingList(mPlaceId);
@@ -209,6 +204,13 @@ public class DetailsRestaurantFragment extends Fragment {
             @Override
             public void onComplete() { }
         });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        updateOtherRestaurantEatingList();
+        mDetailsRestaurantAdapter.notifyDataSetChanged();
     }
 
     // USER LIKE RESTAURANT
@@ -271,10 +273,12 @@ public class DetailsRestaurantFragment extends Fragment {
             public void onChanged(List<UserStateItem> userEatingList) {
                 mUsersEatingList= userEatingList;
                 if(userEatAtRestaurant(mUsersEatingList)){
-                    Log.e(TAG, "userEating found at start" + mUsersEatingList.get(0).getUsername());
+                    Log.e(TAG, "userEating found at start " + mUsersEatingList.get(0).getUsername());
+                    Log.e(TAG, "List when userEating found at start " + mUsersEatingList.toString());
                     mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like));
                 }else{
                     Log.e(TAG, "userEating not found at start");
+                    Log.e(TAG, "List when userEating not found at start " + mUsersEatingList.toString());
                     mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_empty));
                 }
             }
@@ -284,17 +288,21 @@ public class DetailsRestaurantFragment extends Fragment {
     @SuppressLint("UseCompatLoadingForDrawables")
     public void updateEatButtonOnClick(){
         if(userEatAtRestaurant(mUsersEatingList)){
-            Log.e(TAG, "List when userEating found" + mUsersEatingList.toString());
+            Log.e(TAG, "List when userEating found OnClick " + mUsersEatingList.toString());
             mRestaurantManager.removeUsersEating(mPlaceId);
             mRestaurantManager.decreaseUsersEatingCount(mPlaceId);
             mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_empty));
-            Log.e(TAG, "UserEating deleted");
         }else{
-            Log.e(TAG, "List when userEating not found" + mUsersEatingList.toString());
+            Log.e(TAG, "List when userEating not found OnClick " + mUsersEatingList.toString());
             mRestaurantManager.addUsersEating(mPlaceId);
             mRestaurantManager.addUsersEatingCount(mPlaceId);
             mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like));
-            Log.e(TAG, "Adding userEating");
+        }
+    }
+
+    public void updateOtherRestaurantEatingList(){
+        if(userEatAtRestaurant(mUsersEatingList)){
+            mRestaurantManager.deleteUserEatingAtOtherRestaurant(mPlaceId);
         }
     }
 

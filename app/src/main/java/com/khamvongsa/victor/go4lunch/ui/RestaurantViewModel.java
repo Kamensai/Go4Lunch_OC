@@ -52,7 +52,7 @@ public class RestaurantViewModel extends ViewModel {
                     );
                 }
             }else {
-                Log.e(TAG, "UserLikingList null " );
+                Log.e(TAG, "UserEatingList null " );
             }
             return userViewStateItems;
         });
