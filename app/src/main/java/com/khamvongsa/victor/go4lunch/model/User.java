@@ -15,7 +15,7 @@ public class User implements Serializable {
     private String mail;
     @Nullable
     private String urlPicture;
-    private Restaurant chosenRestaurant;
+    private String chosenRestaurant;
 
     public User() { }
 
@@ -33,14 +33,14 @@ public class User implements Serializable {
     public String getMail() { return mail; }
     @Nullable
     public String getUrlPicture() { return urlPicture; }
-    public Restaurant getChosenRestaurant() { return chosenRestaurant; }
+    public String getChosenRestaurant() { return chosenRestaurant; }
 
     // --- SETTERS ---
     public void setUid(String uid) { this.uid = uid; }
     public void setUsername(String username) { this.username = username; }
     public void setMail(String mail) { this.mail = mail; }
     public void setUrlPicture(@Nullable String urlPicture) { this.urlPicture = urlPicture; }
-    public void setChosenRestaurant(Restaurant chosenRestaurant) { this.chosenRestaurant = chosenRestaurant; }
+    public void setChosenRestaurant(String chosenRestaurant) { this.chosenRestaurant = chosenRestaurant; }
 
     @Override
     public boolean equals(Object o) {

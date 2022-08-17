@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
@@ -96,7 +95,6 @@ public class RestaurantViewModel extends ViewModel {
 
     public LiveData<List<FreelanceStateItem>> getAllFreelancesSortedByTJM() {
         return mapDataToViewState(repository.getAllFreelancesSortedByTJM());
-
     }
 
      */

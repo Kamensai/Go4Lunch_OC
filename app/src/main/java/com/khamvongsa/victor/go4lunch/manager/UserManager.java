@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
-import com.khamvongsa.victor.go4lunch.model.Restaurant;
 import com.khamvongsa.victor.go4lunch.model.User;
 import com.khamvongsa.victor.go4lunch.repositories.UserRepository;
 
@@ -66,7 +65,11 @@ public class UserManager {
         return userRepository.updateUsername(username);
     }
 
-    public void updateChosenRestaurant(Restaurant chosenRestaurant){
+    public void updateChosenRestaurant(String chosenRestaurant){
         userRepository.updateChosenRestaurant(chosenRestaurant);
+    }
+
+    public void deleteChosenRestaurant(){
+        userRepository.deleteChosenRestaurant();
     }
 }

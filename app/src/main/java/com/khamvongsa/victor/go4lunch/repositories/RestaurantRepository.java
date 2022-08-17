@@ -25,7 +25,6 @@ import com.khamvongsa.victor.go4lunch.model.User;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -51,9 +50,6 @@ public final class RestaurantRepository {
     private final MutableLiveData<List<User>> mListOfUsersEatingRestaurant = new MutableLiveData<>();
 
     private final MutableLiveData<List<String>> mListOfUsersLikingIdRestaurant = new MutableLiveData<>();
-
-    private String mIdOfOtherRestaurant = "null";
-
 
     private static volatile RestaurantRepository instance;
 

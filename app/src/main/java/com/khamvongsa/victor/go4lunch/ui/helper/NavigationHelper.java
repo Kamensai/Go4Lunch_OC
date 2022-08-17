@@ -15,8 +15,16 @@ import androidx.appcompat.app.AppCompatActivity;
  */
 public class NavigationHelper extends AppCompatActivity {
 
+    private static final String KEY_PLACE_ID = "placeId";
+
     public static void launchNewActivity(Context context, Class mActivityToLaunch) {
         Intent i = new Intent(context, mActivityToLaunch);
+        context.startActivity(i);
+    }
+
+    public static void launchRestaurantActivity(Context context, Class mActivityToLaunch, String placeId) {
+        Intent i = new Intent(context, mActivityToLaunch);
+        i.putExtra(KEY_PLACE_ID, placeId);
         context.startActivity(i);
     }
 

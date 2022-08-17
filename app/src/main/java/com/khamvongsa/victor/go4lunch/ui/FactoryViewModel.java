@@ -32,6 +32,9 @@ public class FactoryViewModel implements ViewModelProvider.Factory {
         if (modelClass.isAssignableFrom(RestaurantViewModel.class)) {
             return (T) new RestaurantViewModel();
         }
+        if (modelClass.isAssignableFrom(UserViewModel.class)) {
+            return (T) new UserViewModel();
+        }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }
 }

@@ -1,30 +1,37 @@
 package com.khamvongsa.victor.go4lunch.repositories;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.khamvongsa.victor.go4lunch.model.Restaurant;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.khamvongsa.victor.go4lunch.model.User;
 
-
 import androidx.annotation.Nullable;
+import androidx.lifecycle.MutableLiveData;
 
 /**
  * Created by <Victor Khamvongsa> on <24/05/2022>
  */
 public final class UserRepository {
 
+    private static final String TAG = UserRepository.class.getSimpleName();
+
     private static final String USERS_COLLECTION = "users";
     private static final String USERNAME_FIELD = "username";
     private static final String MAIL_FIELD = "mail";
     private static final String URL_PICTURE_FIELD = "urlPicture";
     private static final String CHOSEN_RESTAURANT_FIELD = "chosenRestaurant";
+
+    private final MutableLiveData<String> mChosenRestaurantId = new MutableLiveData<>();
 
     private static volatile UserRepository instance;
 
@@ -83,11 +90,15 @@ public final class UserRepository {
             // If the user already exist in Firestore, we get his data (isMentor)
             userData.addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.contains(CHOSEN_RESTAURANT_FIELD)){
-                    userToCreate.setChosenRestaurant((Restaurant) documentSnapshot.get(CHOSEN_RESTAURANT_FIELD));
+                    userToCreate.setChosenRestaurant((String) documentSnapshot.get(CHOSEN_RESTAURANT_FIELD));
                 }
                 this.getUsersCollection().document(uid).set(userToCreate);
             });
         }
+    }
+
+    public MutableLiveData<String> getChosenRestaurantIdMutableLiveData() {
+        return mChosenRestaurantId;
     }
 
     // Get User Data from Firestore
@@ -98,6 +109,36 @@ public final class UserRepository {
         }else{
             return null;
         }
+    }
+
+    public DocumentReference getCurrentUserDoc(){
+        String uid = this.getCurrentUserUID();
+        if(uid != null){
+            return this.getUsersCollection().document(uid);
+        }else{
+            return null;
+        }
+    }
+
+    public void getUserChosenRestaurant() {
+        this.getCurrentUserDoc().addSnapshotListener(new EventListener<DocumentSnapshot>(){
+            @Override
+            public void onEvent(@io.reactivex.annotations.Nullable DocumentSnapshot snapshot,
+                                @io.reactivex.annotations.Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+                if ( snapshot != null && snapshot.exists()) {
+                    String chosenRestaurantId = (String) snapshot.get(CHOSEN_RESTAURANT_FIELD);
+                    mChosenRestaurantId.postValue(chosenRestaurantId);
+                    Log.d(TAG, "Current CHOSEN_RESTAURANT_FIELD : " +chosenRestaurantId);
+                } else {
+                    Log.d(TAG, "Current data: null");
+                    mChosenRestaurantId.postValue(null);
+                }
+            }
+        });
     }
 
     // Update User Username
@@ -112,10 +153,17 @@ public final class UserRepository {
 
     // TODO : récupérer l'id du restaurant
     // Update chosenRestaurant
-    public void updateChosenRestaurant(Restaurant chosenRestaurant) {
+    public void updateChosenRestaurant(String chosenRestaurant) {
         String uid = this.getCurrentUserUID();
         if(uid != null){
             this.getUsersCollection().document(uid).update(CHOSEN_RESTAURANT_FIELD, chosenRestaurant);
+        }
+    }
+
+    public void deleteChosenRestaurant() {
+        String uid = this.getCurrentUserUID();
+        if(uid != null){
+            this.getUsersCollection().document(uid).update(CHOSEN_RESTAURANT_FIELD, null);
         }
     }
 

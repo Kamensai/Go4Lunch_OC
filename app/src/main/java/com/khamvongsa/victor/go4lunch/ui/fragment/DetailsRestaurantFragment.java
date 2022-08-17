@@ -20,10 +20,10 @@ import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.manager.RestaurantManager;
 import com.khamvongsa.victor.go4lunch.manager.UserManager;
 import com.khamvongsa.victor.go4lunch.model.DetailRestaurantPOJO;
-import com.khamvongsa.victor.go4lunch.model.User;
 import com.khamvongsa.victor.go4lunch.model.UserStateItem;
 import com.khamvongsa.victor.go4lunch.ui.FactoryViewModel;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantViewModel;
+import com.khamvongsa.victor.go4lunch.ui.UserViewModel;
 import com.khamvongsa.victor.go4lunch.ui.views.DetailsRestaurantAdapter;
 import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
 
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -52,19 +52,22 @@ public class DetailsRestaurantFragment extends Fragment {
     private UserManager mUserManager = UserManager.getInstance();
     private RestaurantManager mRestaurantManager = RestaurantManager.getInstance();
     private RestaurantViewModel mRestaurantViewModel;
+    private UserViewModel mUserViewModel;
     private DetailsRestaurantAdapter mDetailsRestaurantAdapter;
 
     private static final String USERS_LIKING_LIST_FIELD = "usersLikingList";
     private static final String KEY_PLACE_ID = "placeId";
-    private String mPlaceId;
+    private String mPlaceId = null;
     private String mPhotoReference;
     private String mRestaurantWebsiteLink;
-    private Boolean mRestaurantIsLiked;
     private String mUserId;
     private List<String> mUsersLikingList = new ArrayList<>();
     private List<UserStateItem> mUsersEatingList = new ArrayList<>();
 
     private Disposable disposable;
+
+    TextView mEmptyIdRestaurant;
+    ConstraintLayout mCompleteIdRestaurant;
 
     View mRootView;
 
@@ -81,18 +84,33 @@ public class DetailsRestaurantFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle b = requireActivity().getIntent().getExtras();
-        mPlaceId = b.getString(KEY_PLACE_ID);
         mUserId = mUserManager.getCurrentUser().getUid();
-        showPlaceId(mUserId);
+        Bundle b = requireActivity().getIntent().getExtras();
+        if (b != null && b.getString(KEY_PLACE_ID) != null) {
+            mPlaceId = b.getString(KEY_PLACE_ID);
+            executeHttpRequestWithRetrofit(mPlaceId);
+        }
+        mUserViewModel = new ViewModelProvider(this, FactoryViewModel.getInstance()).get(UserViewModel.class);
         mRestaurantViewModel = new ViewModelProvider(this, FactoryViewModel.getInstance()).get(RestaurantViewModel.class);
         mDetailsRestaurantAdapter = new DetailsRestaurantAdapter();
-        executeHttpRequestWithRetrofit(mPlaceId);
+    }
+
+    private void updateViewFragment(View view,String placeId) {
+        if (placeId == null) {
+            mEmptyIdRestaurant =  view.findViewById(R.id.activity_restaurant_empty_id_restaurant);
+            mEmptyIdRestaurant.setVisibility(View.VISIBLE);
+            mCompleteIdRestaurant.setVisibility(View.GONE);
+            mCompleteIdRestaurant.requestLayout();
+        }else {
+            mCompleteIdRestaurant.setVisibility(View.VISIBLE);
+            showPlaceId(placeId);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_restaurant_details, container, false);
+
         RecyclerView recyclerView = mRootView.findViewById(R.id.activity_restaurant_list_workmates);
         recyclerView.setAdapter(mDetailsRestaurantAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -111,6 +129,9 @@ public class DetailsRestaurantFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mCompleteIdRestaurant = view.findViewById(R.id.activity_restaurant_complete_id_restaurant);
+        updateViewFragment(view, mPlaceId);
 
         mRestaurantName = view.findViewById(R.id.activity_restaurant_name);
         mRestaurantAddress = view.findViewById(R.id.activity_restaurant_address);
@@ -206,12 +227,7 @@ public class DetailsRestaurantFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        updateOtherRestaurantEatingList();
-        mDetailsRestaurantAdapter.notifyDataSetChanged();
-    }
+
 
     // USER LIKE RESTAURANT
 
@@ -291,11 +307,13 @@ public class DetailsRestaurantFragment extends Fragment {
             Log.e(TAG, "List when userEating found OnClick " + mUsersEatingList.toString());
             mRestaurantManager.removeUsersEating(mPlaceId);
             mRestaurantManager.decreaseUsersEatingCount(mPlaceId);
+            mUserManager.deleteChosenRestaurant();
             mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_empty));
         }else{
             Log.e(TAG, "List when userEating not found OnClick " + mUsersEatingList.toString());
             mRestaurantManager.addUsersEating(mPlaceId);
             mRestaurantManager.addUsersEatingCount(mPlaceId);
+            mUserManager.updateChosenRestaurant(mPlaceId);
             mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like));
         }
     }
@@ -336,5 +354,12 @@ public class DetailsRestaurantFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         this.disposeWhenDestroy();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        updateOtherRestaurantEatingList();
+        mDetailsRestaurantAdapter.notifyDataSetChanged();
     }
 }

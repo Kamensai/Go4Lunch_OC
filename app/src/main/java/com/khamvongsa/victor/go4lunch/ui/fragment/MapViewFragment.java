@@ -1,7 +1,6 @@
 package com.khamvongsa.victor.go4lunch.ui.fragment;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -27,8 +26,8 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.khamvongsa.victor.go4lunch.BuildConfig;
 import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.model.NearbyRestaurantPOJO;
-import com.khamvongsa.victor.go4lunch.ui.MainActivity;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantActivity;
+import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +35,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -48,7 +46,7 @@ import io.reactivex.observers.DisposableObserver;
  */
 public class MapViewFragment extends Fragment {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = MapViewFragment.class.getSimpleName();
 
     private GoogleMap mMap;
 
@@ -131,17 +129,9 @@ public class MapViewFragment extends Fragment {
                     @Override
                     public void onInfoWindowClick(@NotNull Marker marker) {
                         String placeId = (String) marker.getTag();
-                        Intent intent = new Intent(getContext(), RestaurantActivity.class);
-                        Intent mDetailsRestaurantFragment = new Intent(getContext(), DetailsRestaurantFragment.class);
-                        mDetailsRestaurantFragment.putExtra(KEY_PLACE_ID, placeId);
-                        Log.i(TAG, placeId);
-                        intent.putExtra(KEY_PLACE_ID, placeId);
-                        startActivity(intent);
-
+                        NavigationHelper.launchRestaurantActivity(getContext(), RestaurantActivity.class, placeId);
                     }
                 });
-
-                // showNearPlaces();
             }
         });
         // Inflate the layout for this fragment

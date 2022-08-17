@@ -2,6 +2,7 @@ package com.khamvongsa.victor.go4lunch.ui;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.firebase.ui.auth.AuthUI;
@@ -18,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -36,11 +39,18 @@ public class MainActivity extends AppCompatActivity {
     Toolbar mToolbar;
     ActionBarDrawerToggle mToggle;
 
+    //Data User
+    private UserViewModel mUserViewModel;
+    private String mUserChosenRestaurant;
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mUserViewModel = new ViewModelProvider(this, FactoryViewModel.getInstance()).get(UserViewModel.class);
 
         //Initialize NavigationDrawer.
         mDrawerLayout = findViewById(R.id.drawer_layout);
@@ -53,6 +63,15 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout.addDrawerListener(mToggle);
         mToggle.syncState();
 
+        mUserViewModel.getChosenRestaurantId().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String chosenRestaurantId) {
+                mUserChosenRestaurant = chosenRestaurantId;
+                Log.d(TAG, "Current CHOSEN_RESTAURANT_FIELD : " + mUserChosenRestaurant);
+            }
+        });
+        mUserViewModel.getUserChosenRestaurant();
+
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -60,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (id) {
                     case R.id.navigation_drawer_lunch:
                         //Do some thing here
-                        NavigationHelper.launchNewActivity(MainActivity.this, RestaurantActivity.class);
+                        NavigationHelper.launchRestaurantActivity(MainActivity.this, RestaurantActivity.class, mUserChosenRestaurant);
                         // add navigation drawer item onclick method here
                         break;
                     case R.id.navigation_drawer_settings:
@@ -129,8 +148,6 @@ public class MainActivity extends AppCompatActivity {
         if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
             mDrawerLayout.closeDrawer(GravityCompat.START);
         }
-        else
-        {super.onBackPressed();
-        }
+        else {super.onBackPressed(); }
     }
 }
