@@ -15,6 +15,7 @@ import com.khamvongsa.victor.go4lunch.ui.RestaurantActivity;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,11 +56,12 @@ public class WorkmatesAdapter extends ListAdapter<UserStateItem, WorkmatesAdapte
 
         @SuppressLint("SetTextI18n")
         public void bind(UserStateItem item) {
-
+            int notDecidedColor = ContextCompat.getColor(itemView.getContext(), R.color.dark_grey);
             if (item.getChosenRestaurantId() != null){
                 mUserNameTextView.setText(item.getUsername() + " is eating at " + "("+ item.getChosenRestaurantName() +")");
             } else {
                 mUserNameTextView.setText(item.getUsername() + " hasn't decided yet");
+                mUserNameTextView.setTextColor(notDecidedColor);
             }
 
             Glide.with(mAvatarImageView)
