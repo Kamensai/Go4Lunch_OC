@@ -15,7 +15,8 @@ public class User implements Serializable {
     private String mail;
     @Nullable
     private String urlPicture;
-    private String chosenRestaurant;
+    private String chosenRestaurantId;
+    private String chosenRestaurantName;
 
     public User() { }
 
@@ -24,7 +25,8 @@ public class User implements Serializable {
         this.username = username;
         this.mail = mail;
         this.urlPicture = urlPicture;
-        this.chosenRestaurant = null;
+        this.chosenRestaurantId = null;
+        this.chosenRestaurantName = null;
     }
 
     // --- GETTERS ---
@@ -33,14 +35,18 @@ public class User implements Serializable {
     public String getMail() { return mail; }
     @Nullable
     public String getUrlPicture() { return urlPicture; }
-    public String getChosenRestaurant() { return chosenRestaurant; }
+    public String getChosenRestaurantId() { return chosenRestaurantId; }
+    public String getChosenRestaurantName() { return chosenRestaurantName; }
+
 
     // --- SETTERS ---
     public void setUid(String uid) { this.uid = uid; }
     public void setUsername(String username) { this.username = username; }
     public void setMail(String mail) { this.mail = mail; }
     public void setUrlPicture(@Nullable String urlPicture) { this.urlPicture = urlPicture; }
-    public void setChosenRestaurant(String chosenRestaurant) { this.chosenRestaurant = chosenRestaurant; }
+    public void setChosenRestaurantId(String chosenRestaurantId) { this.chosenRestaurantId = chosenRestaurantId; }
+    public void setChosenRestaurantName(String chosenRestaurantName) { this.chosenRestaurantName = chosenRestaurantName; }
+
 
     @Override
     public boolean equals(Object o) {
@@ -51,12 +57,13 @@ public class User implements Serializable {
                 Objects.equals(username, user.username) &&
                 Objects.equals(mail, user.mail) &&
                 Objects.equals(urlPicture, user.urlPicture) &&
-                Objects.equals(chosenRestaurant, user.chosenRestaurant);
+                Objects.equals(chosenRestaurantId, user.chosenRestaurantId) &&
+                Objects.equals(chosenRestaurantName, user.chosenRestaurantName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uid, username, mail, urlPicture, chosenRestaurant);
+        return Objects.hash(uid, username, mail, urlPicture, chosenRestaurantId, chosenRestaurantName);
     }
 }
 

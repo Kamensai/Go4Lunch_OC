@@ -7,8 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.khamvongsa.victor.go4lunch.R;
+import com.khamvongsa.victor.go4lunch.ui.FactoryViewModel;
+import com.khamvongsa.victor.go4lunch.ui.UserViewModel;
+import com.khamvongsa.victor.go4lunch.ui.views.WorkmatesAdapter;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,44 +22,20 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class ListWorkmatesFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private UserViewModel mUserViewModel;
+    private WorkmatesAdapter mWorkmatesAdapter;
     private RecyclerView mRecyclerView;
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public ListWorkmatesFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment mapView.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ListWorkmatesFragment newInstance(String param1, String param2) {
-        ListWorkmatesFragment fragment = new ListWorkmatesFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+        mUserViewModel = new ViewModelProvider(this, FactoryViewModel.getInstance()).get(UserViewModel.class);
+        mWorkmatesAdapter = new WorkmatesAdapter();
     }
 
     @Override
@@ -65,8 +45,14 @@ public class ListWorkmatesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list_workmates, container, false);
         Context context = view.getContext();
         mRecyclerView = (RecyclerView) view;
+        mRecyclerView.setAdapter(mWorkmatesAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        getAllUsersSortedByChosenRestaurant();
         return view;
+    }
+
+    private void getAllUsersSortedByChosenRestaurant() {
+        mUserViewModel.getAllUsersSortedByChosenRestaurant().observe(requireActivity(), mWorkmatesAdapter::submitList);
     }
 }

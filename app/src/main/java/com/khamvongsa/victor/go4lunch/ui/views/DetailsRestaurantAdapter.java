@@ -1,5 +1,6 @@
 package com.khamvongsa.victor.go4lunch.ui.views;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,7 +9,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.khamvongsa.victor.go4lunch.model.User;
 import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.model.UserStateItem;
 
@@ -49,8 +49,9 @@ public class DetailsRestaurantAdapter extends ListAdapter<UserStateItem, Details
             avatarImageView= itemView.findViewById(R.id.item_workmate_avatar);
         }
 
+        @SuppressLint("SetTextI18n")
         public void bind(UserStateItem item) {
-            userNameTextView.setText(item.getUsername());
+            userNameTextView.setText(item.getUsername() + " is joining");
             Glide.with(avatarImageView)
                     .load(item.getUrlPicture())
                     .apply(RequestOptions.circleCropTransform())

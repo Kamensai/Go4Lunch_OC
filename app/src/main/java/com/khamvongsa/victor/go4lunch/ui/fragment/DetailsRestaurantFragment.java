@@ -58,8 +58,8 @@ public class DetailsRestaurantFragment extends Fragment {
     private static final String USERS_LIKING_LIST_FIELD = "usersLikingList";
     private static final String KEY_PLACE_ID = "placeId";
     private String mPlaceId = null;
+    private String mPlaceName = null;
     private String mPhotoReference;
-    private String mRestaurantWebsiteLink;
     private String mUserId;
     private List<String> mUsersLikingList = new ArrayList<>();
     private List<UserStateItem> mUsersEatingList = new ArrayList<>();
@@ -110,7 +110,6 @@ public class DetailsRestaurantFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_restaurant_details, container, false);
-
         RecyclerView recyclerView = mRootView.findViewById(R.id.activity_restaurant_list_workmates);
         recyclerView.setAdapter(mDetailsRestaurantAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -151,6 +150,7 @@ public class DetailsRestaurantFragment extends Fragment {
         this.disposable = MapAPIStream.streamFetchDetailRestaurant(placeId).subscribeWith(new DisposableObserver<DetailRestaurantPOJO>() {
             @Override
             public void onNext(@NotNull DetailRestaurantPOJO restaurant) {
+                mPlaceName = restaurant.getResult().getName();
                 mRestaurantName.setText(restaurant.getResult().getName());
                 mRestaurantAddress.setText(restaurant.getResult().getFormattedAddress());
                 setRestaurantPhoto(restaurant);
@@ -313,7 +313,7 @@ public class DetailsRestaurantFragment extends Fragment {
             Log.e(TAG, "List when userEating not found OnClick " + mUsersEatingList.toString());
             mRestaurantManager.addUsersEating(mPlaceId);
             mRestaurantManager.addUsersEatingCount(mPlaceId);
-            mUserManager.updateChosenRestaurant(mPlaceId);
+            mUserManager.updateChosenRestaurantIdAndName(mPlaceId,mPlaceName);
             mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like));
         }
     }

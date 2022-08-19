@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -13,9 +15,16 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.khamvongsa.victor.go4lunch.model.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 /**
@@ -29,9 +38,13 @@ public final class UserRepository {
     private static final String USERNAME_FIELD = "username";
     private static final String MAIL_FIELD = "mail";
     private static final String URL_PICTURE_FIELD = "urlPicture";
-    private static final String CHOSEN_RESTAURANT_FIELD = "chosenRestaurant";
+    private static final String CHOSEN_RESTAURANT_ID_FIELD = "chosenRestaurantId";
+    private static final String CHOSEN_RESTAURANT_NAME_FIELD = "chosenRestaurantName";
+
 
     private final MutableLiveData<String> mChosenRestaurantId = new MutableLiveData<>();
+
+    private final MutableLiveData<List<User>> mUsersList = new MutableLiveData<>();
 
     private static volatile UserRepository instance;
 
@@ -89,8 +102,11 @@ public final class UserRepository {
             Task<DocumentSnapshot> userData = getUserData();
             // If the user already exist in Firestore, we get his data (isMentor)
             userData.addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.contains(CHOSEN_RESTAURANT_FIELD)){
-                    userToCreate.setChosenRestaurant((String) documentSnapshot.get(CHOSEN_RESTAURANT_FIELD));
+                if (documentSnapshot.contains(CHOSEN_RESTAURANT_ID_FIELD)){
+                    userToCreate.setChosenRestaurantId((String) documentSnapshot.get(CHOSEN_RESTAURANT_ID_FIELD));
+                }
+                if (documentSnapshot.contains(CHOSEN_RESTAURANT_NAME_FIELD)){
+                    userToCreate.setChosenRestaurantName((String) documentSnapshot.get(CHOSEN_RESTAURANT_NAME_FIELD));
                 }
                 this.getUsersCollection().document(uid).set(userToCreate);
             });
@@ -99,6 +115,34 @@ public final class UserRepository {
 
     public MutableLiveData<String> getChosenRestaurantIdMutableLiveData() {
         return mChosenRestaurantId;
+    }
+
+    public Task<QuerySnapshot> getAllUsersSortedByChosenRestaurant(){
+        return getUsersCollection().orderBy(CHOSEN_RESTAURANT_ID_FIELD).get();
+    }
+
+    public LiveData<List<User>> getAllUsersSortedByChosenRestaurantMutableLiveData() {
+        getAllUsersSortedByChosenRestaurant().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    ArrayList<User> users = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        users.add(document.toObject(User.class));
+                    }
+                    mUsersList.postValue(users);
+                } else {
+                    Log.d("Error", "Error getting documents: ", task.getException());
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                //handle error
+                mUsersList.postValue(null);
+            }
+        });
+        return mUsersList;
     }
 
     // Get User Data from Firestore
@@ -130,9 +174,9 @@ public final class UserRepository {
                     return;
                 }
                 if ( snapshot != null && snapshot.exists()) {
-                    String chosenRestaurantId = (String) snapshot.get(CHOSEN_RESTAURANT_FIELD);
+                    String chosenRestaurantId = (String) snapshot.get(CHOSEN_RESTAURANT_ID_FIELD);
                     mChosenRestaurantId.postValue(chosenRestaurantId);
-                    Log.d(TAG, "Current CHOSEN_RESTAURANT_FIELD : " +chosenRestaurantId);
+                    Log.d(TAG, "Current CHOSEN_RESTAURANT_ID_FIELD : " +chosenRestaurantId);
                 } else {
                     Log.d(TAG, "Current data: null");
                     mChosenRestaurantId.postValue(null);
@@ -153,17 +197,19 @@ public final class UserRepository {
 
     // TODO : récupérer l'id du restaurant
     // Update chosenRestaurant
-    public void updateChosenRestaurant(String chosenRestaurant) {
+    public void updateChosenRestaurantIdAndName(String chosenRestaurantId, String chosenRestaurantName) {
         String uid = this.getCurrentUserUID();
         if(uid != null){
-            this.getUsersCollection().document(uid).update(CHOSEN_RESTAURANT_FIELD, chosenRestaurant);
+            this.getUsersCollection().document(uid).update(CHOSEN_RESTAURANT_ID_FIELD, chosenRestaurantId);
+            this.getUsersCollection().document(uid).update(CHOSEN_RESTAURANT_NAME_FIELD, chosenRestaurantName);
         }
     }
 
-    public void deleteChosenRestaurant() {
+    public void deleteChosenRestaurantIdAndName() {
         String uid = this.getCurrentUserUID();
         if(uid != null){
-            this.getUsersCollection().document(uid).update(CHOSEN_RESTAURANT_FIELD, null);
+            this.getUsersCollection().document(uid).update(CHOSEN_RESTAURANT_ID_FIELD, null);
+            this.getUsersCollection().document(uid).update(CHOSEN_RESTAURANT_NAME_FIELD, null);
         }
     }
 

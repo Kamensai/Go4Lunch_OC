@@ -2,7 +2,12 @@ package com.khamvongsa.victor.go4lunch.ui;
 
 import android.util.Log;
 
+import com.khamvongsa.victor.go4lunch.model.User;
+import com.khamvongsa.victor.go4lunch.model.UserStateItem;
 import com.khamvongsa.victor.go4lunch.repositories.UserRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
@@ -33,12 +38,29 @@ public class UserViewModel extends ViewModel {
         });
     }
 
+    //Mapping data from remote source to view data, ask to your mentor to know why it is important to do so
+    private LiveData<List<UserStateItem>> mapDataToViewState(LiveData<List<User>> users) {
+        return Transformations.map(users, user -> {
+            List<UserStateItem> userStateItems = new ArrayList<>();
+            for (User u : user) {
+                userStateItems.add(
+                        new UserStateItem(u)
+                );
+            }
+            return userStateItems;
+        });
+    }
+
     public LiveData<String> getChosenRestaurantId() {
         return mapDataToString(mUserRepository.getChosenRestaurantIdMutableLiveData());
     }
 
     public void getUserChosenRestaurant() {
         mUserRepository.getUserChosenRestaurant();
+    }
+
+    public LiveData<List<UserStateItem>> getAllUsersSortedByChosenRestaurant() {
+        return mapDataToViewState(mUserRepository.getAllUsersSortedByChosenRestaurantMutableLiveData());
     }
 
 }

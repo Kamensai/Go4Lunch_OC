@@ -65,11 +65,11 @@ public class UserManager {
         return userRepository.updateUsername(username);
     }
 
-    public void updateChosenRestaurant(String chosenRestaurant){
-        userRepository.updateChosenRestaurant(chosenRestaurant);
+    public void updateChosenRestaurantIdAndName(String chosenRestaurantId, String chosenRestaurantName){
+        userRepository.updateChosenRestaurantIdAndName(chosenRestaurantId, chosenRestaurantName);
     }
 
     public void deleteChosenRestaurant(){
-        userRepository.deleteChosenRestaurant();
+        userRepository.deleteChosenRestaurantIdAndName();
     }
 }
