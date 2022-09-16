@@ -59,7 +59,10 @@
     
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
     <string name="facebook_application_id" translatable="false">921003241950626</string>
-    <string name="fb_login_protocol_scheme" translatable="false">fb921003241950626</string>.
+    <string name="fb_login_protocol_scheme" translatable="false">fb921003241950626</string>
+    <string name="opening_hour">Opening hours</string>
+    <string name="restaurant_distance">distance</string>
+    <string name="eating_number">2</string>.
 
 
 

@@ -13,28 +13,116 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/item_workmate_avatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="16dp"
+            android:id="@+id/item_restaurant_avatar"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp" />
 
         <TextView
-            android:id="@+id/lbl_task_name"
+            android:id="@+id/item_restaurant_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_marginTop="8dp"
-            android:layout_toEndOf="@+id/item_workmate_avatar"
             android:ellipsize="end"
             android:lines="1"
             android:textSize="16sp"
             android:textStyle="bold"
-            tools:text="@string/name_is_joining" />
+            android:layout_toStartOf="@+id/item_restaurant_distance"
+            tools:text="@string/restaurant_name" />
+
+        <TextView
+            android:id="@+id/item_restaurant_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:textSize="14sp"
+            android:textColor="@color/dark_grey"
+            android:layout_toStartOf="@+id/item_restaurant_avatar"
+            tools:text="@string/restaurant_distance" />
+
+        <TextView
+            android:id="@+id/item_restaurant_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_toStartOf="@+id/item_restaurant_user_icon"
+            android:layout_below="@id/item_restaurant_name"
+            tools:text="@string/address_restaurant" />
+
+        <ImageView
+            android:id="@+id/item_restaurant_user_icon"
+            android:layout_width="14dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="8dp"
+            android:layout_toStartOf="@+id/item_restaurant_user_eating_number"
+            android:layout_below="@id/item_restaurant_distance" />
+
+        <TextView
+            android:id="@+id/item_restaurant_user_eating_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:lines="1"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_toStartOf="@+id/item_restaurant_avatar"
+            android:layout_below="@id/item_restaurant_distance" />
+
+        <TextView
+            android:id="@+id/item_restaurant_opening"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:lines="1"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:layout_toStartOf="@+id/item_restaurant_liked_1"
+            android:layout_below="@id/item_restaurant_address"
+            tools:text="@string/opening_hour" />
+
+        <ImageView
+            android:id="@+id/item_restaurant_liked_3"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_toStartOf="@+id/item_restaurant_liked_2"
+            android:layout_below="@id/item_restaurant_user_icon" />
+
+        <ImageView
+            android:id="@+id/item_restaurant_liked_2"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_toStartOf="@+id/item_restaurant_liked_1"
+            android:layout_below="@id/item_restaurant_user_icon" />
+
+        <ImageView
+            android:id="@+id/item_restaurant_liked_1"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_toStartOf="@+id/item_restaurant_avatar"
+            android:layout_below="@id/item_restaurant_user_icon" />
 
     </RelativeLayout>
 

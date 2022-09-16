@@ -48,11 +48,29 @@ public class ListWorkmatesFragment extends Fragment {
         mRecyclerView.setAdapter(mWorkmatesAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        getAllUsersSortedByChosenRestaurant();
         return view;
+    }
+
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getAllUsersSortedByChosenRestaurant();
     }
 
     private void getAllUsersSortedByChosenRestaurant() {
         mUserViewModel.getAllUsersSortedByChosenRestaurant().observe(requireActivity(), mWorkmatesAdapter::submitList);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getAllUsersSortedByChosenRestaurant();
+        mWorkmatesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        getAllUsersSortedByChosenRestaurant();
+        mWorkmatesAdapter.notifyDataSetChanged();
     }
 }

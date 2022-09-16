@@ -29,6 +29,15 @@ public class User implements Serializable {
         this.chosenRestaurantName = null;
     }
 
+    public User(String uid, String username, String mail) {
+        this.uid = uid;
+        this.username = username;
+        this.mail = mail;
+        this.urlPicture = null;
+        this.chosenRestaurantId = null;
+        this.chosenRestaurantName = null;
+    }
+
     // --- GETTERS ---
     public String getUid() { return uid; }
     public String getUsername() { return username; }

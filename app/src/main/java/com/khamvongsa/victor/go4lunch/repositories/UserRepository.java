@@ -98,21 +98,34 @@ public final class UserRepository {
             String uid = user.getUid();
             String mail = user.getEmail();
 
-            User userToCreate = new User(uid, username, mail, urlPicture);
-
-            Task<DocumentSnapshot> userData = getUserData();
-            // If the user already exist in Firestore, we get his data (isMentor)
-            userData.addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.contains(CHOSEN_RESTAURANT_ID_FIELD)){
-                    userToCreate.setChosenRestaurantId((String) documentSnapshot.get(CHOSEN_RESTAURANT_ID_FIELD));
-                }
-                if (documentSnapshot.contains(CHOSEN_RESTAURANT_NAME_FIELD)){
-                    userToCreate.setChosenRestaurantName((String) documentSnapshot.get(CHOSEN_RESTAURANT_NAME_FIELD));
-                }
-                this.getUsersCollection().document(uid).set(userToCreate);
-            });
+            User userToCreate;
+            if (urlPicture != null){
+                userToCreate = new User(uid, username, mail, urlPicture);
+            } else {
+                userToCreate = new User(uid, username, mail);
+            }
+            setUserToCreate(userToCreate);
         }
     }
+
+    private void setUserToCreate(User userToCreate){
+        String uid = userToCreate.getUid();
+        Task<DocumentSnapshot> userData = getUserData();
+        // If the user already exist in Firestore, we get his data (isMentor)
+        userData.addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.contains(CHOSEN_RESTAURANT_ID_FIELD)){
+                userToCreate.setChosenRestaurantId((String) documentSnapshot.get(CHOSEN_RESTAURANT_ID_FIELD));
+            }
+            if (documentSnapshot.contains(CHOSEN_RESTAURANT_NAME_FIELD)){
+                userToCreate.setChosenRestaurantName((String) documentSnapshot.get(CHOSEN_RESTAURANT_NAME_FIELD));
+            }
+            if (documentSnapshot.contains(URL_PICTURE_FIELD)){
+                userToCreate.setUrlPicture((String) documentSnapshot.get(URL_PICTURE_FIELD));
+            }
+            this.getUsersCollection().document(uid).set(userToCreate);
+        });
+    }
+
 
     public MutableLiveData<String> getChosenRestaurantIdMutableLiveData() {
         return mChosenRestaurantId;

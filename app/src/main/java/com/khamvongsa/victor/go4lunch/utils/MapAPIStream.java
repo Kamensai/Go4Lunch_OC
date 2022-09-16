@@ -31,6 +31,14 @@ public class MapAPIStream {
                 .timeout(10, TimeUnit.SECONDS);
     }
 
+    public static Observable<DetailRestaurantPOJO> streamFetchOpenRestaurant(String placeId){
+        MapAPIService mapAPIService = MapAPIService.retrofit.create(MapAPIService.class);
+        return mapAPIService.getDetailRestaurant(placeId,"name,formatted_address,geometry,opening_hours,photo",  BuildConfig.MAPS_API_KEY)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .timeout(10, TimeUnit.SECONDS);
+    }
+
     public static Observable<String> streamFetchPhotoRestaurant(String photoReference){
         MapAPIService mapAPIService = MapAPIService.retrofit.create(MapAPIService.class);
         return mapAPIService.getPhotoRestaurant(270, photoReference, BuildConfig.MAPS_API_KEY)

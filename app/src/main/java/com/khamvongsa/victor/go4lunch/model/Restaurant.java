@@ -2,15 +2,16 @@ package com.khamvongsa.victor.go4lunch.model;
 
 import com.google.firebase.firestore.DocumentReference;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.Nullable;
 
 /**
  * Created by <Victor Khamvongsa> on <23/05/2022>
  */
-public class Restaurant {
+public class Restaurant implements Serializable {
 
     private String restaurantId;
     private String name;
@@ -18,22 +19,43 @@ public class Restaurant {
     @Nullable
     private String urlPicture;
     private String address;
-    private String distance;
+    private int distance;
     private String website;
     private String phone;
     private String type;
-    private Number usersEatingCount;
-    private Number usersLikingCount;
+    private int usersEatingCount;
+    private int usersLikingCount;
     private Boolean favorite;
     private Boolean openingHours;
+    private Boolean openNow;
+    private String openUntil;
     private List<DocumentReference> usersEatingList;
     private List<String> usersLikingList;
 
     public Restaurant() { }
 
+    public Restaurant (String restaurantId, String name, String address, @Nullable String urlPicture, @Nullable Boolean openNow, @Nullable String openUntil,
+                       int usersLikingCount, int usersEatingCount, int distance) {
+        this.restaurantId = restaurantId;
+        this.name = name;
+        this.address = address;
+        this.urlPicture = urlPicture;
+        this.openNow = openNow;
+        this.openUntil = openUntil;
+        this.usersLikingCount = usersLikingCount;
+        this.usersEatingCount = usersEatingCount;
+        this.distance = distance;
+    }
+
+    public Restaurant (Boolean openNow, String openUntil){
+        this.openNow = openNow;
+        this.openUntil = openUntil;
+    }
+
     public Restaurant (String restaurantId, String name) {
         this.restaurantId = restaurantId;
         this.name = name;
+        this.distance = 0;
         this.type = null;
         this.usersEatingList = null;
         this.usersLikingList = null;
@@ -41,10 +63,8 @@ public class Restaurant {
         this.usersLikingCount = 0;
     }
     // TODO : Collection for restaurants liked and restaurants chosen
-    public Restaurant (String restaurantId, String name, String type) {
+    public Restaurant (String restaurantId) {
         this.restaurantId = restaurantId;
-        this.name = name;
-        this.type = type;
         this.usersEatingList = null;
         this.usersLikingList = null;
     }
@@ -59,9 +79,7 @@ public class Restaurant {
         this.phone = phone;
         this.favorite = false;
         this.openingHours = false;
-        this.distance = null;
         this.usersEatingList = null;
-
     }
 
     // --- GETTERS ---
@@ -76,7 +94,7 @@ public class Restaurant {
 
     public String getAddress() { return address; }
 
-    public String getDistance() { return distance; }
+    public int getDistance() { return distance; }
 
     public String getWebsite() { return website; }
 
@@ -88,11 +106,15 @@ public class Restaurant {
 
     public Boolean getOpeningHours() { return openingHours; }
 
+    public Boolean getOpenNow() { return openNow; }
+
+    public String getOpenUntil() { return openUntil; }
+
     public List<DocumentReference> getUsersEatingList() { return usersEatingList; }
 
-    public Number getUsersEatingCount() { return usersEatingCount; }
+    public int getUsersEatingCount() { return usersEatingCount; }
 
-    public Number getUsersLikingCount() { return usersLikingCount; }
+    public int getUsersLikingCount() { return usersLikingCount; }
 
     public List<String> getUsersLikingList() { return usersLikingList; }
 
@@ -108,7 +130,7 @@ public class Restaurant {
 
     public void setAddress(String address) { this.address = address; }
 
-    public void setDistance(String distance) { this.distance = distance; }
+    public void setDistance(int distance) { this.distance = distance; }
 
     public void setWebsite(String website) { this.website = website; }
 
@@ -120,11 +142,37 @@ public class Restaurant {
 
     public void setOpeningHours(Boolean openingHours) { this.openingHours = openingHours; }
 
+    public void setOpenNow(Boolean openNow) { this.openNow = openNow; }
+
+    public void setOpenUntil(String openUntil) { this.openUntil = openUntil; }
+
     public void setUsersEatingList(List<DocumentReference> usersEatingList) { this.usersEatingList = usersEatingList; }
 
-    public void setUsersEatingCount(Number usersEatingCount) { this.usersEatingCount = usersEatingCount; }
+    public void setUsersEatingCount(int usersEatingCount) { this.usersEatingCount = usersEatingCount; }
 
     public void setUsersLikingList(List<String> usersLikingList) { this.usersLikingList = usersLikingList; }
 
-    public void setUsersLikingCount(Number usersLikingCount) { this.usersLikingCount = usersLikingCount; }
+    public void setUsersLikingCount(int usersLikingCount) { this.usersLikingCount = usersLikingCount; }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Restaurant)) return false;
+        Restaurant restaurant = (Restaurant) o;
+        return  Objects.equals(restaurantId, restaurant.restaurantId) &&
+                Objects.equals(name, restaurant.name) &&
+                Objects.equals(address, restaurant.address) &&
+                Objects.equals(urlPicture, restaurant.urlPicture) &&
+                Objects.equals(openNow, restaurant.openNow) &&
+                Objects.equals(openUntil, restaurant.openUntil) &&
+                Objects.equals(usersLikingCount, restaurant.usersLikingCount) &&
+                Objects.equals(usersEatingCount, restaurant.usersEatingCount) &&
+                Objects.equals(distance, restaurant.distance);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(restaurantId, name, address, urlPicture, openNow, openUntil, usersLikingCount, usersEatingCount, distance);
+    }
 }

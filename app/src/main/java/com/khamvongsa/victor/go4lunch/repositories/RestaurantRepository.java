@@ -51,6 +51,12 @@ public final class RestaurantRepository {
 
     private final MutableLiveData<List<String>> mListOfUsersLikingIdRestaurant = new MutableLiveData<>();
 
+    private final MutableLiveData<List<Restaurant>> mListOfRestaurantLiked = new MutableLiveData<>();
+
+    private final MutableLiveData<List<Restaurant>> mListOfRestaurantEating = new MutableLiveData<>();
+
+    private final MutableLiveData<Number> mCountOfUsersLikingRestaurant = new MutableLiveData<>();
+
     private static volatile RestaurantRepository instance;
 
     private UserManager userManager;
@@ -149,11 +155,11 @@ public final class RestaurantRepository {
         }
     }
 
-    public Task<QuerySnapshot> getRestaurantLiked(){
+    public Task<QuerySnapshot> getRestaurantLikedList(){
             return this.getRestaurantLikedCollection().get();
     }
 
-    public Task<QuerySnapshot> getRestaurantToEat(){
+    public Task<QuerySnapshot> getRestaurantEatingList(){
             return this.getRestaurantToEatCollection().get();
     }
 
@@ -181,6 +187,14 @@ public final class RestaurantRepository {
         return mListOfUsersEatingRestaurant;
     }
 
+    public MutableLiveData<List<Restaurant>> getAllRestaurantLikedListMutableLiveData() {
+        return mListOfRestaurantLiked;
+    }
+
+    public MutableLiveData<List<Restaurant>> getAllRestaurantEatingListMutableLiveData() {
+        return mListOfRestaurantEating;
+    }
+
     public void deleteUserEatingAtOtherRestaurant(String restaurantIdClickedOn){
         this.getRestaurantUserIsEatingAt().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -206,9 +220,54 @@ public final class RestaurantRepository {
         });
     }
 
+    // GET RESTAURANTLIKED
+    public void getRestaurantsLikedList() {
+        this.getRestaurantLikedList().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<Restaurant> restaurantLikedList = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d(TAG, document.getId() + " => " + document.getData());
+                        Restaurant restaurant = ((DocumentSnapshot) document).toObject(Restaurant.class);
+                        Log.d(TAG, restaurant.getName());
+                        restaurantLikedList.add(restaurant);
+                    }
+                    mListOfRestaurantLiked.postValue(restaurantLikedList);
+                    Log.d(TAG, "Current RESTAURANT_COLLECTION : " + restaurantLikedList);
+                } else {
+                    mListOfRestaurantLiked.postValue(null);
+                    Log.d(TAG, "Error getting documents: ", task.getException());
+                }
+            }
+        });
+    }
+
+    // GET RESTAURANTEATING
+    public void getRestaurantsEatingList() {
+        this.getRestaurantEatingList().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<Restaurant> restaurantEatingList = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.d(TAG, document.getId() + " => " + document.getData());
+                        Restaurant restaurant = ((DocumentSnapshot) document).toObject(Restaurant.class);
+                        Log.d(TAG, restaurant.getName());
+                        restaurantEatingList.add(restaurant);
+                    }
+                    mListOfRestaurantEating.postValue(restaurantEatingList);
+                    Log.d(TAG, "Current RESTAURANT_EATING_COLLECTION : " + restaurantEatingList);
+                } else {
+                    mListOfRestaurantEating.postValue(null);
+                    Log.d(TAG, "Error getting documents: ", task.getException());
+                }
+            }
+        });
+    }
 
 
-    // TODO : help from https://firebase.google.com/docs/firestore/query-data/listen
+        // TODO : help from https://firebase.google.com/docs/firestore/query-data/listen
     @SuppressWarnings("unchecked")
     public void getUsersLikingListId(String restaurantId) {
         this.getRestaurantLikedDoc(restaurantId).addSnapshotListener(new EventListener<DocumentSnapshot>(){
@@ -236,7 +295,7 @@ public final class RestaurantRepository {
 
     @SuppressWarnings("unchecked")
     public void getUsersLikingListIdBis(String restaurantId) {
-        this.getRestaurantLiked().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        this.getRestaurantLikedList().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -258,7 +317,56 @@ public final class RestaurantRepository {
         });
     }
 
-    // TODO : Vérifier Help StackOverflow : https://stackoverflow.com/questions/51892766/android-firestore-convert-array-of-document-references-to-listpojo
+    @SuppressWarnings("unchecked")
+    public void getCountRestaurantsLikedBis(String restaurantId) {
+        this.getRestaurantLikedDoc(restaurantId).addSnapshotListener(new EventListener<DocumentSnapshot>(){
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+                if (snapshot != null && snapshot.exists()) {
+                    Number usersLikingRestaurantCount = (Number) snapshot.get(USERS_LIKING_COUNT_FIELD);
+                        mCountOfUsersLikingRestaurant.setValue(usersLikingRestaurantCount);
+                        Log.d(TAG, "Current USERS_LIKING_COUNT_FIELD : " + usersLikingRestaurantCount);
+                    Log.d(TAG, "Current USERS_LIKING_COUNT_FIELD : " + mCountOfUsersLikingRestaurant.getValue());
+                } else {
+
+                    mCountOfUsersLikingRestaurant.setValue(0);
+                    Log.d(TAG, "Current data: " + mCountOfUsersLikingRestaurant.getValue());
+                }
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    public void getCountRestaurantsLiked(String restaurantId) {
+        this.getRestaurantLikedDoc(restaurantId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Number usersLikingRestaurantCount = (Number) document.get(USERS_LIKING_COUNT_FIELD);
+                        mCountOfUsersLikingRestaurant.postValue(usersLikingRestaurantCount);
+                        Log.d(TAG, "DocumentSnapshot data: " + usersLikingRestaurantCount);
+
+                    } else {
+                        mCountOfUsersLikingRestaurant.postValue(0);
+                        Log.d(TAG, "No such document" + mCountOfUsersLikingRestaurant);
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+
+
+        // TODO : Vérifier Help StackOverflow : https://stackoverflow.com/questions/51892766/android-firestore-convert-array-of-document-references-to-listpojo
     //  https://stackoverflow.com/questions/52537965/how-can-i-get-data-from-array-data-field-from-cloud-firestore
     //  https://stackoverflow.com/questions/46757614/how-to-update-an-array-of-objects-with-firestore
 

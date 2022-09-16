@@ -64,13 +64,19 @@ public class UserStateItem {
         if (!(o instanceof UserStateItem)) return false;
         UserStateItem that = (UserStateItem) o;
         if (that.urlPicture != null){
-            urlPictureIsTrue = urlPicture.equals(that.urlPicture);
+            if (urlPicture != null){
+                urlPictureIsTrue = urlPicture.equals(that.urlPicture);
+            }
         }
-        if (that.chosenRestaurantId != null){
-            chosenRestaurantIdTrue = chosenRestaurantId.equals(that.chosenRestaurantId);
+        if (that.chosenRestaurantId != null ){
+            if (chosenRestaurantId != null){
+                chosenRestaurantIdTrue = chosenRestaurantId.equals(that.chosenRestaurantId);
+            }
         }
         if (that.chosenRestaurantName != null){
-            chosenRestaurantIdTrue = chosenRestaurantName.equals(that.chosenRestaurantName);
+            if (chosenRestaurantName != null) {
+                chosenRestaurantNameTrue = chosenRestaurantName.equals(that.chosenRestaurantName);
+            }
         }
         return uid.equals(that.uid) &&
                 username.equals(that.username) &&

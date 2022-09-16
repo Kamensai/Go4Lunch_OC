@@ -1,6 +1,7 @@
 package com.khamvongsa.victor.go4lunch.ui.views;
 
 import android.annotation.SuppressLint;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,12 +58,17 @@ public class WorkmatesAdapter extends ListAdapter<UserStateItem, WorkmatesAdapte
         @SuppressLint("SetTextI18n")
         public void bind(UserStateItem item) {
             int notDecidedColor = ContextCompat.getColor(itemView.getContext(), R.color.dark_grey);
+            int decidedColor = ContextCompat.getColor(itemView.getContext(), R.color.black);
             if (item.getChosenRestaurantId() != null){
                 mUserNameTextView.setText(item.getUsername() + " is eating at " + "("+ item.getChosenRestaurantName() +")");
+                mUserNameTextView.setTextColor(decidedColor);
+                mUserNameTextView.setTypeface(Typeface.create(mUserNameTextView.getTypeface(), Typeface.NORMAL), Typeface.BOLD);
             } else {
                 mUserNameTextView.setText(item.getUsername() + " hasn't decided yet");
                 mUserNameTextView.setTextColor(notDecidedColor);
+                mUserNameTextView.setTypeface(null, Typeface.BOLD_ITALIC);
             }
+            mUserNameTextView.setVisibility(View.VISIBLE);
 
             Glide.with(mAvatarImageView)
                     .load(item.getUrlPicture())

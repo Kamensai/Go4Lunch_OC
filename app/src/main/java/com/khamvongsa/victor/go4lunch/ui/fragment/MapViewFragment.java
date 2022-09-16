@@ -1,7 +1,12 @@
 package com.khamvongsa.victor.go4lunch.ui.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +20,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -25,19 +32,30 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.khamvongsa.victor.go4lunch.BuildConfig;
 import com.khamvongsa.victor.go4lunch.R;
+import com.khamvongsa.victor.go4lunch.model.DetailRestaurantPOJO;
 import com.khamvongsa.victor.go4lunch.model.NearbyRestaurantPOJO;
+import com.khamvongsa.victor.go4lunch.model.Restaurant;
+import com.khamvongsa.victor.go4lunch.model.RestaurantEatingItem;
+import com.khamvongsa.victor.go4lunch.model.RestaurantLikedItem;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantActivity;
+import com.khamvongsa.victor.go4lunch.ui.RestaurantViewModel;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
@@ -80,7 +98,28 @@ public class MapViewFragment extends Fragment {
     private LatLng[] likelyPlaceLatLngs;
 
     //FOR DATA
-    private Disposable disposable;
+    private Disposable mDisposableRestaurantLocation;
+
+    private Disposable mDisposableRestaurantDetails;
+
+    private RestaurantViewModel mRestaurantViewModel;
+
+    private List<Restaurant> mRestaurantList = new ArrayList<>();
+
+    private List<RestaurantLikedItem> mRestaurantLikedList = new ArrayList<>();
+
+    private List<RestaurantEatingItem> mRestaurantEatingList = new ArrayList<>();
+
+    private int mCountUsersLiking;
+
+    private int mCountUsersEating;
+
+    private Restaurant mCreateRestaurant = new Restaurant();
+
+
+    public MapViewFragment() {
+        // Required empty public constructor
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -90,6 +129,13 @@ public class MapViewFragment extends Fragment {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
+
+        //Get Data from ViewModels
+        mRestaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+        mRestaurantViewModel.getRestaurantsLikedList();
+        getAllRestaurantsLikedList();
+        mRestaurantViewModel.getRestaurantsEatingList();
+        getAllRestaurantsEatingList();
 
         View view = inflater.inflate(R.layout.fragment_map_view, container, false);
 
@@ -108,11 +154,8 @@ public class MapViewFragment extends Fragment {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
                 mMap = googleMap;
-
                 getLocationPermission();
-
                 getDeviceLocation();
-
                 updateLocationUI();
 
                 mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
@@ -219,7 +262,7 @@ public class MapViewFragment extends Fragment {
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             lastKnownLocation = task.getResult();
-                            // TODO : Afficher les restaurants proches.
+                            // TODO : Afficher les restaurants proches. Help : https://stackoverflow.com/questions/50090135/pass-data-fragment-to-fragment-in-the-same-activity
                             if (lastKnownLocation != null) {
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(lastKnownLocation.getLatitude(),
@@ -335,27 +378,59 @@ public class MapViewFragment extends Fragment {
     // HTTP (RxJAVA)
     // -------------------
 
+    // https://stackoverflow.com/questions/42365658/custom-marker-in-google-maps-in-android-with-vector-asset-icon/45564994#45564994
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, @DrawableRes int vectorResId) {
+        Drawable background = ContextCompat.getDrawable(context, vectorResId);
+        background.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, R.drawable.ic_dining_place);
+        vectorDrawable.setBounds(20, 20, vectorDrawable.getIntrinsicWidth() + 40, vectorDrawable.getIntrinsicHeight() + 20);
+        Bitmap bitmap = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        background.draw(canvas);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    // ToResize an IconFromBitmap
+    public Bitmap resizeBitmap(String drawableName,int width, int height){
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(drawableName, "drawable", getActivity().getPackageName()));
+        Canvas canvas = new Canvas(imageBitmap);
+        return Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+    }
+    //         Icon by <a href="https://freeicons.io/profile/3">freeicons</a> on <a href="https://freeicons.io">freeicons.io</a>
     private void executeHttpRequestWithRetrofit(Location lastKnownLocation){
         String location = lastKnownLocation.getLatitude() + "," + lastKnownLocation.getLongitude();
-        this.disposable = MapAPIStream.streamFetchNearbyRestaurant(location).subscribeWith(new DisposableObserver<NearbyRestaurantPOJO>() {
+        this.mDisposableRestaurantLocation = MapAPIStream.streamFetchNearbyRestaurant(location).subscribeWith(new DisposableObserver<NearbyRestaurantPOJO>() {
             @Override
             public void onNext(@NotNull NearbyRestaurantPOJO restaurants) {
                 // 6 - Update RecyclerView after getting results from Googlemap API
                 mMap.clear();
                 for (NearbyRestaurantPOJO.PlaceResults r : restaurants.getPlaceResults()) {
+                    String restaurantId = r.getPlaceId();
+                    getRestaurantDetails(restaurantId);
                     double lat = r.getGeometry().getLocation().getLat();
                     double lng = r.getGeometry().getLocation().getLng();
-                    String name = r.getName();
-                    String restaurantId = r.getPlaceId();
                     LatLng latLng = new LatLng(lat, lng);
-                    Marker marker = mMap.addMarker(new MarkerOptions()
-                            .position(latLng)
-                            .title(name));
-                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.icon)));
-                    // TODO : changer le visuel
+                    String name = r.getName();
+
+                    restaurantIsEatingAt(mRestaurantEatingList, restaurantId);
+                    Marker marker;
+                    if (mCountUsersEating > 0){
+                        marker = mMap.addMarker(new MarkerOptions()
+                                .position(latLng)
+                                .title(name)
+                                .icon(bitmapDescriptorFromVector(getContext(), R.drawable.ic_dining_location_with_users )));
+                        // TODO : changer le visuel
+                    } else {
+                        marker = mMap.addMarker(new MarkerOptions()
+                                .position(latLng)
+                                .title(name)
+                                .icon(bitmapDescriptorFromVector(getContext(), R.drawable.ic_dining_location_without_users )));
+                    }
                     assert marker != null;
                     marker.setTag(restaurantId);
                 }
+                mRestaurantViewModel.setRestaurantList(mRestaurantList);
             }
 
             @Override
@@ -367,7 +442,8 @@ public class MapViewFragment extends Fragment {
     }
 
     private void disposeWhenDestroy(){
-        if (this.disposable != null && !this.disposable.isDisposed()) this.disposable.dispose();
+        if (this.mDisposableRestaurantLocation != null && !this.mDisposableRestaurantLocation.isDisposed()) this.mDisposableRestaurantLocation.dispose();
+        if (this.mDisposableRestaurantDetails != null && !this.mDisposableRestaurantDetails.isDisposed()) this.mDisposableRestaurantDetails.dispose();
     }
 
     @Override
@@ -375,5 +451,136 @@ public class MapViewFragment extends Fragment {
         super.onDestroy();
         this.disposeWhenDestroy();
     }
+
+    // TODO go search in MapAPIStream to fetch data precisely
+    // TODO : Demander à François comment afficher les heures correctement dans l'adapter
+    // TODO : Rajouter CountOfUsersEatingAtRestaurant dans les modelsRestaurant pour récupérer les données.
+    private void getRestaurantDetails(String restaurantId){
+        this.mDisposableRestaurantDetails = MapAPIStream.streamFetchOpenRestaurant(restaurantId).subscribeWith(new DisposableObserver<DetailRestaurantPOJO>() {
+            @Override
+            public void onNext(@NotNull DetailRestaurantPOJO restaurant) {
+                restaurantIsLiked(mRestaurantLikedList, restaurantId);
+                restaurantIsEatingAt(mRestaurantEatingList, restaurantId);
+
+                //Name and Address
+                String name = restaurant.getResult().getName();
+                String address = restaurant.getResult().getFormattedAddress();
+
+                //Picture
+                String urlPicture;
+                if (restaurant.getResult().getPhotos() != null && !restaurant.getResult().getPhotos().isEmpty()) {
+                    urlPicture = MapAPIStream.getImageUrl(restaurant.getResult().getPhotos().get(0).getPhotoReference());
+                } else {
+                    urlPicture = "null";
+                }
+                Log.e(TAG, urlPicture);
+
+                // Opening Hours
+                Calendar date = Calendar.getInstance(Locale.FRANCE);
+                int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
+                System.out.println("Day Of the Week : " + dayOfWeek);
+                Boolean openNow = false;
+                String openUntil = "null";
+
+                if (restaurant.getResult().getOpeningHours() != null) {
+                    openNow = restaurant.getResult().getOpeningHours().getOpenNow();
+                    if (openNow){
+                        List<DetailRestaurantPOJO.Period> listOpenPeriods = restaurant.getResult().getOpeningHours().getPeriods();
+                        if (listOpenPeriods.size() > 0 ){
+                            int i = 0;
+                            while ( i < listOpenPeriods.size()){
+                                int realDayOfWeek = dayOfWeek - 1;
+                                System.out.println("Day Of the Week : " + realDayOfWeek + " == restaurantDay " + listOpenPeriods.get(i).getOpen().getDay());
+                                if ((realDayOfWeek) == listOpenPeriods.get(i).getOpen().getDay()){
+                                    openUntil = listOpenPeriods.get(i).getClose().getTime();
+                                    break;
+                                }
+                                i++;
+                            }
+                        }
+                    }
+                }
+
+                // Distance
+                float[] resultDistance = new float[2];
+                Location.distanceBetween(lastKnownLocation.getLatitude(),lastKnownLocation.getLongitude(),
+                        restaurant.getResult().getGeometry().getLocation().getLat(), restaurant.getResult().getGeometry().getLocation().getLng(), resultDistance);
+                int distance = (int)Math.round(resultDistance[0]);
+
+                Restaurant createRestaurant = new Restaurant(restaurantId, name, address, urlPicture, openNow, openUntil, mCountUsersLiking, mCountUsersEating, distance);
+                mRestaurantList.add(createRestaurant);
+            }
+
+            @Override
+            public void onError(@NotNull Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+    }
+
+    public void getAllRestaurantsLikedList(){
+        mRestaurantViewModel.getAllRestaurantLikedList().observe(requireActivity(), new Observer<List<RestaurantLikedItem>>() {
+            @SuppressLint("UseCompatLoadingForDrawables")
+            @Override
+            public void onChanged(List<RestaurantLikedItem> restaurantLikedItemList) {
+                mRestaurantLikedList = restaurantLikedItemList;
+            }
+        });
+    }
+
+    public void restaurantIsLiked(List<RestaurantLikedItem> restaurantLikedItemList, String restaurantId){
+        if (restaurantLikedItemList != null && restaurantLikedItemList.size() > 0){
+            for (RestaurantLikedItem rId : restaurantLikedItemList){
+                if (rId.getRestaurantId().equals(restaurantId)){
+                    mCountUsersLiking = rId.getUsersLikingCount();
+                    break;
+                }
+                else {
+                    mCountUsersLiking = 0;
+                }
+            }
+        }
+    }
+
+
+
+    public void getAllRestaurantsEatingList(){
+        mRestaurantViewModel.getAllRestaurantEatingList().observe(requireActivity(), new Observer<List<RestaurantEatingItem>>() {
+            @SuppressLint("UseCompatLoadingForDrawables")
+            @Override
+            public void onChanged(List<RestaurantEatingItem> restaurantToEatItemList) {
+                mRestaurantEatingList = restaurantToEatItemList;
+            }
+        });
+    }
+
+    public void restaurantIsEatingAt(List<RestaurantEatingItem> restaurantEatingItemList, String restaurantId){
+        if (restaurantEatingItemList != null && restaurantEatingItemList.size() > 0){
+            for (RestaurantEatingItem rId : restaurantEatingItemList){
+                if (rId.getRestaurantId().equals(restaurantId)){
+                    mCountUsersEating = rId.getUsersEatingCount();
+                    System.out.println(TAG + " UserEatingCount : " + mCountUsersEating);
+                    break;
+                }
+                else {
+                    mCountUsersEating = 0;
+                }
+            }
+        }
+    }
+
+/*
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.e(TAG, lastKnownLocation.toString());
+        getParentFragmentManager().beginTransaction().add(R.id.navHostFragment, ListViewRestaurantFragment.newInstance(lastKnownLocation)).commit();
+    }
+ */
 
 }
