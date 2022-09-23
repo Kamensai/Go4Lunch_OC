@@ -11,6 +11,7 @@
     <string name="logout">LOGOUT</string>
     <string name="user_name">User Name</string>
     <string name="user_mail_adress">User mail address</string>
+    <string name="menu_search">search</string>.
 
     <!-- RESTAURANT ACTIVITY -->
     <string name="empty_restaurant">Pas de restaurant choisi !</string>
@@ -23,6 +24,7 @@
     <string name="connection_succeed">Authentification réussie !</string>
     <string name="button_login_text_logged">Afficher le profil</string>
     <string name="button_login_text_not_logged">Connexion</string>
+    <string name="restaurant_search_hint">Choose a Restaurant</string>
 
     <!-- LOGIN ACTIVITY -->
     <string name="title_sign_in">Sign in</string>
@@ -62,8 +64,7 @@
     <string name="fb_login_protocol_scheme" translatable="false">fb921003241950626</string>
     <string name="opening_hour">Opening hours</string>
     <string name="restaurant_distance">distance</string>
-    <string name="eating_number">2</string>.
-
+    <string name="eating_number">2</string>
 
 
 </resources>

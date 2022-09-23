@@ -1,6 +1,7 @@
 package com.khamvongsa.victor.go4lunch.ui;
 
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -12,6 +13,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
+
+import java.lang.reflect.Field;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -57,6 +60,14 @@ public class MainActivity extends AppCompatActivity {
         mNavigationView = findViewById(R.id.navigation_drawer_view);
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
+        try {
+            Field mCollapseIcon = mToolbar.getClass().getDeclaredField("mCollapseIcon");
+            mCollapseIcon.setAccessible(true);
+            Drawable drw = (Drawable) mCollapseIcon.get(mToolbar);
+            drw.setTint(getResources().getColor(R.color.white));
+        }
+        catch (Exception e) {
+        }
         // NavigationDrawer menu.
         mNavigationView.bringToFront();
         mToggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);

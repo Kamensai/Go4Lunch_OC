@@ -29,8 +29,6 @@ public class RestaurantViewModel extends ViewModel {
 
     private final MutableLiveData<List<Restaurant>> mRestaurantList = new MutableLiveData<>();
 
-    private final MutableLiveData<Restaurant> mRestaurantOpen = new MutableLiveData<>();
-
     public RestaurantViewModel() {
         mRestaurantRepository = RestaurantRepository.getInstance();
     }

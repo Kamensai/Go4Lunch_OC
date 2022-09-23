@@ -3,6 +3,7 @@ package com.khamvongsa.victor.go4lunch.ui.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,8 +12,13 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -37,9 +43,11 @@ import com.khamvongsa.victor.go4lunch.model.NearbyRestaurantPOJO;
 import com.khamvongsa.victor.go4lunch.model.Restaurant;
 import com.khamvongsa.victor.go4lunch.model.RestaurantEatingItem;
 import com.khamvongsa.victor.go4lunch.model.RestaurantLikedItem;
+import com.khamvongsa.victor.go4lunch.model.RestaurantLocation;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantActivity;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantViewModel;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
+import com.khamvongsa.victor.go4lunch.ui.views.MapSearchViewAdapter;
 import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
 
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +59,7 @@ import java.util.Locale;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -67,6 +76,13 @@ public class MapViewFragment extends Fragment {
     private static final String TAG = MapViewFragment.class.getSimpleName();
 
     private GoogleMap mMap;
+
+    private String[] columns = new String[] { "_id", "text" };
+
+    //Menu
+    private MenuItem mMenuItem;
+    private SearchView mSearchView;
+    private MapSearchViewAdapter mMapSearchViewAdapter;
 
     // The entry point to the Places API.
     private PlacesClient placesClient;
@@ -104,18 +120,17 @@ public class MapViewFragment extends Fragment {
 
     private RestaurantViewModel mRestaurantViewModel;
 
-    private List<Restaurant> mRestaurantList = new ArrayList<>();
+    private List<Restaurant> mRestaurantList;
 
     private List<RestaurantLikedItem> mRestaurantLikedList = new ArrayList<>();
 
     private List<RestaurantEatingItem> mRestaurantEatingList = new ArrayList<>();
 
+    private List<RestaurantLocation> mRestaurantLocationList;
+
     private int mCountUsersLiking;
 
     private int mCountUsersEating;
-
-    private Restaurant mCreateRestaurant = new Restaurant();
-
 
     public MapViewFragment() {
         // Required empty public constructor
@@ -405,6 +420,8 @@ public class MapViewFragment extends Fragment {
             public void onNext(@NotNull NearbyRestaurantPOJO restaurants) {
                 // 6 - Update RecyclerView after getting results from Googlemap API
                 mMap.clear();
+                mRestaurantList = new ArrayList<>();
+                mRestaurantLocationList = new ArrayList<>();
                 for (NearbyRestaurantPOJO.PlaceResults r : restaurants.getPlaceResults()) {
                     String restaurantId = r.getPlaceId();
                     getRestaurantDetails(restaurantId);
@@ -429,8 +446,11 @@ public class MapViewFragment extends Fragment {
                     }
                     assert marker != null;
                     marker.setTag(restaurantId);
+                    RestaurantLocation restaurantLocation = new RestaurantLocation(restaurantId, name, latLng);
+                    mRestaurantLocationList.add(restaurantLocation);
                 }
                 mRestaurantViewModel.setRestaurantList(mRestaurantList);
+                setHasOptionsMenu(true);
             }
 
             @Override
@@ -441,16 +461,6 @@ public class MapViewFragment extends Fragment {
         });
     }
 
-    private void disposeWhenDestroy(){
-        if (this.mDisposableRestaurantLocation != null && !this.mDisposableRestaurantLocation.isDisposed()) this.mDisposableRestaurantLocation.dispose();
-        if (this.mDisposableRestaurantDetails != null && !this.mDisposableRestaurantDetails.isDisposed()) this.mDisposableRestaurantDetails.dispose();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        this.disposeWhenDestroy();
-    }
 
     // TODO go search in MapAPIStream to fetch data precisely
     // TODO : Demander à François comment afficher les heures correctement dans l'adapter
@@ -574,7 +584,115 @@ public class MapViewFragment extends Fragment {
         }
     }
 
-/*
+    // Help from https://stackoverflow.com/questions/26786179/searchview-filtering-and-set-suggestions and
+    // https://stackoverflow.com/questions/28335935/set-text-in-searchview-after-selecting-item-from-searchable-suggestion-window
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.search_menu, menu);
+        mMenuItem = menu.findItem(R.id.search_bar);
+        mSearchView = (SearchView) mMenuItem.getActionView();
+        EditText editText = (EditText) mSearchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        editText.setTextColor(getResources().getColor(R.color.white));
+        editText.setHint("Choose a Restaurant");
+        editText.setHintTextColor(getResources().getColor(R.color.grey));
+        ImageView searchClose  = (ImageView) mSearchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        searchClose.setColorFilter(getResources().getColor(R.color.white));
+
+        Object[] temp = new Object[] { 0, "default" };
+
+        final MatrixCursor cursor = new MatrixCursor(columns);
+        for (int i = 0; i < mRestaurantLocationList.size(); i++) {
+            temp[0] = i;
+            temp[1] = mRestaurantLocationList.get(i);
+            cursor.addRow(temp);
+        }
+        Log.e(TAG, "RestaurantLocationListSize inOption : " + mRestaurantLocationList.size());
+
+        mMapSearchViewAdapter = new MapSearchViewAdapter(getContext(), cursor, mRestaurantLocationList);
+        mSearchView.setSuggestionsAdapter(mMapSearchViewAdapter);
+        mSearchView.setIconified(true);
+
+        //SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        //mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query != null){
+                    mMapSearchViewAdapter.getFilter().filter(query);
+                }
+                showRestaurant(query);
+                return true;
+                //Don't forget to return "true" in the onSuggestionClick callback,
+                //if you return true it makes sure that the event is not returned to the parent, but if you return false,
+                //android assumes you want even the parent to handle the event and the parent event handler gets called.
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                if (query != null){
+                    mMapSearchViewAdapter.getFilter().filter(query);
+                }
+                return true;
+            }
+        });
+
+        mSearchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                String suggestion = getSuggestion(position).getName();
+                mSearchView.setQuery(suggestion, false);
+                showRestaurant(suggestion);
+                return true;
+            }
+        });
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private RestaurantLocation getSuggestion(int position) {
+        RestaurantLocation suggest1 = (RestaurantLocation) mSearchView.getSuggestionsAdapter().getItem(position);
+        return suggest1;
+    }
+
+    private void showRestaurant(String location){
+
+        // checking if the entered location is null or not.
+        if (location != null || location.equals("")) {
+            List<RestaurantLocation> filterList = new ArrayList<>();
+            for (RestaurantLocation restaurantLocation : mRestaurantLocationList ){
+                if (restaurantLocation.getName().toLowerCase().contains(location.toLowerCase())){
+                    filterList.add(restaurantLocation);
+                }
+            }
+            if (filterList.size() > 0) {
+                // on below line we are getting the location
+                // from our list a first position.
+                RestaurantLocation restaurantLocation = filterList.get(0);
+
+                // below line is to animate camera to that position.
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(restaurantLocation.getLatLng(), 20));
+            }
+        }
+    }
+
+    private void disposeWhenDestroy(){
+        if (this.mDisposableRestaurantLocation != null && !this.mDisposableRestaurantLocation.isDisposed()) this.mDisposableRestaurantLocation.dispose();
+        if (this.mDisposableRestaurantDetails != null && !this.mDisposableRestaurantDetails.isDisposed()) this.mDisposableRestaurantDetails.dispose();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.disposeWhenDestroy();
+    }
+
+    /*
     @Override
     public void onPause() {
         super.onPause();
