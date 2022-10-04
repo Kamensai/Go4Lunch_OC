@@ -2,7 +2,10 @@ package com.khamvongsa.victor.go4lunch.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -46,6 +49,7 @@ import com.khamvongsa.victor.go4lunch.model.RestaurantLikedItem;
 import com.khamvongsa.victor.go4lunch.model.RestaurantLocation;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantActivity;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantViewModel;
+import com.khamvongsa.victor.go4lunch.ui.helper.LocaleHelper;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 import com.khamvongsa.victor.go4lunch.ui.views.MapSearchViewAdapter;
 import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
@@ -65,13 +69,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
 /**
  * Created by <Victor Khamvongsa> on <18/11/2021>
  */
-public class MapViewFragment extends Fragment {
+public class MapViewFragment extends Fragment{
 
     private static final String TAG = MapViewFragment.class.getSimpleName();
 
@@ -147,16 +152,19 @@ public class MapViewFragment extends Fragment {
 
         //Get Data from ViewModels
         mRestaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+        /*
         mRestaurantViewModel.getRestaurantsLikedList();
         getAllRestaurantsLikedList();
         mRestaurantViewModel.getRestaurantsEatingList();
         getAllRestaurantsEatingList();
 
+         */
+
         View view = inflater.inflate(R.layout.fragment_map_view, container, false);
 
         // Construct a PlacesClient
-        Places.initialize(this.requireContext(), BuildConfig.MAPS_API_KEY);
-        placesClient = Places.createClient(this.requireActivity());
+        //Places.initialize(this.requireContext(), BuildConfig.MAPS_API_KEY);
+        //placesClient = Places.createClient(this.requireActivity());
 
         // Construct a FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.requireActivity());
@@ -165,6 +173,7 @@ public class MapViewFragment extends Fragment {
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.google_map);
         assert mapFragment != null;
+        /*
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -192,6 +201,8 @@ public class MapViewFragment extends Fragment {
                 });
             }
         });
+
+         */
         // Inflate the layout for this fragment
         return view;
     }
@@ -282,7 +293,7 @@ public class MapViewFragment extends Fragment {
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(lastKnownLocation.getLatitude(),
                                                 lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                                executeHttpRequestWithRetrofit(lastKnownLocation);
+                                //executeHttpRequestWithRetrofit(lastKnownLocation);
                             }
 
                         } else {

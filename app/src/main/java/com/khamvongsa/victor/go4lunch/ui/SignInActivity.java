@@ -1,5 +1,6 @@
 package com.khamvongsa.victor.go4lunch.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -11,6 +12,7 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.material.snackbar.Snackbar;
 import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.manager.UserManager;
+import com.khamvongsa.victor.go4lunch.ui.helper.LocaleHelper;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 
 import java.util.Arrays;
@@ -27,6 +29,11 @@ public class SignInActivity extends AppCompatActivity {
 
     // SIGN IN
     private UserManager mUserManager = UserManager.getInstance();
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase, "en"));
+    }
 
 
     // See: https://developer.android.com/training/basics/intents/result

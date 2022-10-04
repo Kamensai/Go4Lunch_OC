@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Go4Lunch</string>
     <!-- TODO: Remove or change this placeholder text -->
@@ -25,10 +26,10 @@
 
     <!-- MAIN ACTIVITY -->
     <string name="error_not_connected">You have to be connected !</string>
-    <string name="error_authentication_canceled">Authentification canceled&#8230;</string>
+    <string name="error_authentication_canceled">Authentification annulée&#8230;</string>
     <string name="error_no_internet">No internet !</string>
-    <string name="error_unknown_error">Unknown error &#8230;</string>
-    <string name="connection_succeed">Connection succeeded !</string>
+    <string name="error_unknown_error">Une erreur inconnue s\'est produite&#8230;</string>
+    <string name="connection_succeed">Authentification réussie !</string>
     <string name="button_login_text_logged">Show profile</string>
     <string name="button_login_text_not_logged">Connexion</string>
     <string name="restaurant_search_hint">Choose a Restaurant</string>
@@ -64,7 +65,7 @@
     <!-- MAP -->
     <string name="default_info_title">Default Location</string>
     <string name="default_info_snippet">No places found, because location permission is disabled.</string>
-    
+
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
     <string name="facebook_application_id" translatable="false">921003241950626</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb921003241950626</string>
@@ -84,5 +85,4 @@
     <string name="report_technical">Report technical issues or suggest new features</string>
     <string name="enable_message_notifications">Enable message notifications</string>
     <string name="send_feedback">Send feedback</string>
-
 </resources>

@@ -53,13 +53,13 @@ public class ListWorkmatesFragment extends Fragment {
 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getAllUsersSortedByChosenRestaurant();
+        //getAllUsersSortedByChosenRestaurant();
     }
 
     private void getAllUsersSortedByChosenRestaurant() {
         mUserViewModel.getAllUsersSortedByChosenRestaurant().observe(requireActivity(), mWorkmatesAdapter::submitList);
     }
-
+/*
     @Override
     public void onResume() {
         super.onResume();
@@ -73,4 +73,6 @@ public class ListWorkmatesFragment extends Fragment {
         getAllUsersSortedByChosenRestaurant();
         mWorkmatesAdapter.notifyDataSetChanged();
     }
+
+ */
 }

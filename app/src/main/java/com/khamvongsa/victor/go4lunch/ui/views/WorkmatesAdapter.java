@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.protobuf.StringValue;
 import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.model.UserStateItem;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantActivity;
@@ -57,14 +58,16 @@ public class WorkmatesAdapter extends ListAdapter<UserStateItem, WorkmatesAdapte
 
         @SuppressLint("SetTextI18n")
         public void bind(UserStateItem item) {
+            String eatAt = itemView.getContext().getResources().getString(R.string.is_eating_at);
+            String notDecided = itemView.getContext().getResources().getString(R.string.not_decided_yet);
             int notDecidedColor = ContextCompat.getColor(itemView.getContext(), R.color.dark_grey);
             int decidedColor = ContextCompat.getColor(itemView.getContext(), R.color.black);
             if (item.getChosenRestaurantId() != null){
-                mUserNameTextView.setText(item.getUsername() + " is eating at " + "("+ item.getChosenRestaurantName() +")");
+                mUserNameTextView.setText(item.getUsername() + eatAt + "("+ item.getChosenRestaurantName() +")");
                 mUserNameTextView.setTextColor(decidedColor);
                 mUserNameTextView.setTypeface(Typeface.create(mUserNameTextView.getTypeface(), Typeface.NORMAL), Typeface.BOLD);
             } else {
-                mUserNameTextView.setText(item.getUsername() + " hasn't decided yet");
+                mUserNameTextView.setText(item.getUsername() + notDecided);
                 mUserNameTextView.setTextColor(notDecidedColor);
                 mUserNameTextView.setTypeface(null, Typeface.BOLD_ITALIC);
             }

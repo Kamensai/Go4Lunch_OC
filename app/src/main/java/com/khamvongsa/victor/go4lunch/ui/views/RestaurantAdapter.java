@@ -1,6 +1,7 @@
 package com.khamvongsa.victor.go4lunch.ui.views;
 
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -148,7 +149,11 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
 
     @Override
     public int getItemCount() {
-        return mRestaurantStateItemListSearchFiltered.size();
+        if (mRestaurantStateItemListSearchFiltered != null){
+            return mRestaurantStateItemListSearchFiltered.size();
+        }else {
+            return 0;
+        }
     }
 
     public RestaurantStateItem getItem(int position) {
@@ -227,6 +232,8 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
             int likingCount = item.getUsersLikingCount();
             int eatingCount = item.getUsersEatingCount();
             String eatingCountString = String.valueOf(eatingCount);
+            String openUntil = itemView.getContext().getResources().getString(R.string.open_until);
+            String closedRestaurant = itemView.getContext().getResources().getString(R.string.closed_restaurant);
             System.out.println(TAG + " UserEatingCount : " + eatingCount);
             int nameColor = ContextCompat.getColor(itemView.getContext(), R.color.black);
             mRestaurantNameTextView.setText(item.getName());
@@ -285,9 +292,9 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
 
             // IS OPEN
             if (item.getOpenNow() != null && item.getOpenNow()) {
-                mRestaurantOpeningHourTextView.setText("Open until " + item.getOpenUntil());
+                mRestaurantOpeningHourTextView.setText(openUntil + item.getOpenUntil());
             } else if (item.getOpenNow() != null && !item.getOpenNow()) {
-                mRestaurantOpeningHourTextView.setText("restaurant is closed");
+                mRestaurantOpeningHourTextView.setText(closedRestaurant);
             }
 
             //URLPICTURE

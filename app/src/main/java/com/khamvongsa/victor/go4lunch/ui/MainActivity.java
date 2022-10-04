@@ -1,5 +1,7 @@
 package com.khamvongsa.victor.go4lunch.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -12,9 +14,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.khamvongsa.victor.go4lunch.R;
+import com.khamvongsa.victor.go4lunch.ui.helper.LocaleHelper;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 
 import java.lang.reflect.Field;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -28,6 +32,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
     Toolbar mToolbar;
     ActionBarDrawerToggle mToggle;
 
+    //UpdateView
+    private Boolean localeChanged = false;
+    private String initialLocale;
     //Data User
     private UserViewModel mUserViewModel;
     private String mUserChosenRestaurant;
@@ -49,8 +57,24 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase, "en"));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (initialLocale != null && !initialLocale.equals(LocaleHelper.getPersistedLocale(this))) {
+            recreate();
+            overridePendingTransition(0, 0);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initialLocale = LocaleHelper.getPersistedLocale(this);
+        Log.e(TAG, initialLocale);
         setContentView(R.layout.activity_main);
 
         mUserViewModel = new ViewModelProvider(this, FactoryViewModel.getInstance()).get(UserViewModel.class);
@@ -73,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         mToggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(mToggle);
         mToggle.syncState();
-
+/*
         mUserViewModel.getChosenRestaurantId().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String chosenRestaurantId) {
@@ -83,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
         });
         mUserViewModel.getUserChosenRestaurant();
 
+
+ */
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Go4Lunch</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="map_view">Carte</string>
+    <string name="list_view">Liste Restaurants</string>
+    <string name="workmates">Collègues</string>
+    <string name="your_lunch">RESTAURANT</string>
+    <string name="settings">PARAMETRES</string>
+    <string name="title_settings">Paramètres</string>
+    <string name="logout">DECONNEXION</string>
+    <string name="user_name">Nom d\'utilisateur</string>
+    <string name="user_mail_adress">adresse mail</string>
+    <string name="menu_search">chercher</string>.
+
+    <!-- RESTAURANT ACTIVITY -->
+    <string name="call">APPEL</string>
+    <string name="like">AIMER</string>
+    <string name="website">SITE</string>
+    <string name="is_joining">" y mange"</string>
+    <string name="name_is_joining">Nom y mange</string>
+    <string name="opening_hour">Heures d\'ouverture</string>
+    <string name="restaurant_distance">distance</string>
+    <string name="eating_number">2</string>
+
+    <!-- MAIN ACTIVITY -->
+    <string name="empty_restaurant">Vous n\'avez pas choisi de restaurant !</string>
+    <string name="open_until">"Ouvert jusqu'à "</string>
+    <string name="closed_restaurant">Restaurant fermé</string>
+    <string name="is_eating_at">" mange à "</string>
+    <string name="not_decided_yet">" n'a pas encore décidé"</string>
+    <string name="error_not_connected">Vous devez être connecté !</string>
+    <string name="error_authentication_canceled">Authentification annulée&#8230;</string>
+    <string name="error_no_internet">Pas d\'internet !</string>
+    <string name="error_unknown_error">Une erreur inconnue s\'est produite&#8230;</string>
+    <string name="connection_succeed">Authentification réussie !</string>
+    <string name="button_login_text_logged">Profile</string>
+    <string name="button_login_text_not_logged">Connexion</string>
+    <string name="restaurant_search_hint">Choisissez un Restaurant</string>
+
+    <!-- LOGIN ACTIVITY -->
+    <string name="title_sign_in">Se connecter</string>
+    <string name="toolbar_title_login_activity">Profil</string>
+    <string name="text_input_username">Nom d\'utilisateur</string>
+    <string name="text_view_email">Adresse mail :</string>
+    <string name="button_update_account">Update username</string>
+    <string name="button_delete_account">Delete my account</string>
+    <string name="button_sign_out_account">Se déconnecter</string>
+    <string name="info_no_email_found">pas d\'adresse mail</string>
+    <string name="info_no_username_found">Pas de nom d\'utilisateur</string>
+    <string name="popup_message_confirmation_delete_account">ëtes-vous sûr de supprimer votre compte? ?</string>
+    <string name="popup_message_choice_yes">Oui !</string>
+    <string name="popup_message_choice_no">Non</string>
+
+    <!-- NavigationDrawer text -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title">Go4Lunch</string>
+    <string name="user_picture">photo d\'utilisateur</string>
+    <string name="restaurant_name">nom du restaurant</string>
+    <string name="restaurant">Restaurant</string>
+    <string name="address_restaurant">addresse restaurant</string>
+
+
+    <!-- MAP -->
+    <string name="default_info_title">Default Location</string>
+    <string name="default_info_snippet">Pas de restaurant trouvé, veuillez activer la localisation.</string>
+
+    <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
+    <string name="facebook_application_id" translatable="false">921003241950626</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb921003241950626</string>
+
+    <!-- SETTINGS -->
+    <string-array name="language_names">
+        <item>Anglais</item>
+        <item>Français</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>en</item>
+        <item>fr</item>
+    </string-array>
+    <string name="current_language">Français</string>
+    <string name="language_title">Language</string>
+
+    <string name="report_technical">Signaler les problèmes techniques ou suggérer de nouvelles fonctionnalités</string>
+    <string name="enable_message_notifications">Activer les notifications de messages</string>
+    <string name="send_feedback">Envoyer un commentaire</string>
+</resources>

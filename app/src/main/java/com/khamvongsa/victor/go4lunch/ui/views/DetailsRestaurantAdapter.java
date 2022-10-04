@@ -51,7 +51,8 @@ public class DetailsRestaurantAdapter extends ListAdapter<UserStateItem, Details
 
         @SuppressLint("SetTextI18n")
         public void bind(UserStateItem item) {
-            userNameTextView.setText(item.getUsername() + " is joining");
+            String isJoining = itemView.getContext().getResources().getString(R.string.is_joining);
+            userNameTextView.setText(item.getUsername() +" "+ isJoining);
             Glide.with(avatarImageView)
                     .load(item.getUrlPicture())
                     .apply(RequestOptions.circleCropTransform())

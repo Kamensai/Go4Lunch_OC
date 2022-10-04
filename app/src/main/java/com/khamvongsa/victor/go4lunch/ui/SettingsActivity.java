@@ -1,9 +1,11 @@
 package com.khamvongsa.victor.go4lunch.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.ui.fragment.SettingsFragment;
+import com.khamvongsa.victor.go4lunch.ui.helper.LocaleHelper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,6 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
  * Created by <Victor Khamvongsa> on <26/01/2022>
  */
 public class SettingsActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase, "en"));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

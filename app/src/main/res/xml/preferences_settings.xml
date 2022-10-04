@@ -3,11 +3,19 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
         <SwitchPreferenceCompat
             app:key="notifications"
-            app:title="Enable message notifications"/>
+            app:title="@string/enable_message_notifications"/>
 
         <Preference
             app:key="feedback"
-            app:title="Send feedback"
-            app:summary="Report technical issues or suggest new features"/>
+            app:title="@string/send_feedback"
+            app:summary="@string/report_technical"/>
+
+        <ListPreference
+            app:defaultValue="en"
+            app:entries="@array/language_names"
+            app:entryValues="@array/language_values"
+            app:key="language"
+            app:summary="@string/current_language"
+            app:title="@string/language_title"/>
 
 </PreferenceScreen>

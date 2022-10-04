@@ -84,11 +84,11 @@ public class DetailsRestaurantFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserId = mUserManager.getCurrentUser().getUid();
+        //mUserId = mUserManager.getCurrentUser().getUid();
         Bundle b = requireActivity().getIntent().getExtras();
         if (b != null && b.getString(KEY_PLACE_ID) != null) {
             mPlaceId = b.getString(KEY_PLACE_ID);
-            executeHttpRequestWithRetrofit(mPlaceId);
+            //executeHttpRequestWithRetrofit(mPlaceId);
         }
         mUserViewModel = new ViewModelProvider(this, FactoryViewModel.getInstance()).get(UserViewModel.class);
         mRestaurantViewModel = new ViewModelProvider(this, FactoryViewModel.getInstance()).get(RestaurantViewModel.class);
@@ -113,7 +113,7 @@ public class DetailsRestaurantFragment extends Fragment {
         RecyclerView recyclerView = mRootView.findViewById(R.id.activity_restaurant_list_workmates);
         recyclerView.setAdapter(mDetailsRestaurantAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        getUsersEatingList();
+        //getUsersEatingList();
         return mRootView;
     }
 

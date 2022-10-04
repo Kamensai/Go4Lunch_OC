@@ -10,6 +10,7 @@
 
 
     <application
+        android:name=".MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -32,7 +33,6 @@
 
         <activity
             android:name="com.facebook.FacebookActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
 
         <activity
@@ -50,19 +50,25 @@
 
         <activity
             android:name=".ui.RestaurantActivity"
-            android:label="@string/restaurant" />
+            android:label="@string/restaurant"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation|locale"/>
 
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/title_settings"
-            android:theme="@style/SettingsActivityTheme" />
+            android:theme="@style/SettingsActivityTheme"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation|locale"/>
 
         <activity android:name=".ui.MainActivity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation|locale">
+
+        </activity>
 
         <activity
             android:name=".ui.SignInActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation|locale">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
