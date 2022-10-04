@@ -19,6 +19,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+// Help from https://stackoverflow.com/questions/4985805/set-locale-programmatically
 /**
  * Created by <Victor Khamvongsa> on <21/01/2022>
  */
