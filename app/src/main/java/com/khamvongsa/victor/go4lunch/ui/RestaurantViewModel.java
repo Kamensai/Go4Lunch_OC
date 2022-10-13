@@ -5,6 +5,7 @@ import android.util.Log;
 import com.khamvongsa.victor.go4lunch.model.Restaurant;
 import com.khamvongsa.victor.go4lunch.model.RestaurantEatingItem;
 import com.khamvongsa.victor.go4lunch.model.RestaurantLikedItem;
+import com.khamvongsa.victor.go4lunch.model.RestaurantNotification;
 import com.khamvongsa.victor.go4lunch.model.RestaurantStateItem;
 import com.khamvongsa.victor.go4lunch.model.User;
 import com.khamvongsa.victor.go4lunch.model.UserStateItem;
@@ -146,6 +147,14 @@ public class RestaurantViewModel extends ViewModel {
 
     public LiveData<List<UserStateItem>> getAllUsersEatingList() {
         return mapUserDataToViewState(mRestaurantRepository.getAllUsersEatingListMutableLiveData());
+    }
+
+    public LiveData<RestaurantNotification> getRestaurantNotification() {
+        return mRestaurantRepository.getRestaurantNotificationMutableLiveData();
+    }
+
+    public void getRestaurantInfoNotification(String restaurantId) {
+        mRestaurantRepository.getInfoNotification(restaurantId);
     }
 
     public void getUsersEatingList(String restaurantId) {

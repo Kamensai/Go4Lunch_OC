@@ -37,8 +37,8 @@ public class RestaurantManager {
         restaurantRepository.createRestaurantLiked(restaurantId, name);
     }
 
-    public void createChosenRestaurant(String restaurantId, String name){
-        restaurantRepository.createReferenceToRestaurantChosen(restaurantId, name);
+    public void createChosenRestaurant(String restaurantId, String name, String address){
+        restaurantRepository.createReferenceToRestaurantChosen(restaurantId, name, address);
     }
 
     public void getUsersEatingList(String restaurantId) {

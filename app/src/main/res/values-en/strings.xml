@@ -68,7 +68,9 @@
 
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
     <string name="facebook_application_id" translatable="false">921003241950626</string>
-    <string name="fb_login_protocol_scheme" translatable="false">fb921003241950626</string>
+
+    <!-- NOTIFICATION SERVICE -->
+    <string name="notification_title">"You have a notification"</string>
 
     <!-- SETTINGS -->
     <string-array name="language_names">

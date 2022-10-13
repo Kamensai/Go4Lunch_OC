@@ -2,9 +2,12 @@ package com.khamvongsa.victor.go4lunch.ui.fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,10 +23,12 @@ import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.manager.RestaurantManager;
 import com.khamvongsa.victor.go4lunch.manager.UserManager;
 import com.khamvongsa.victor.go4lunch.model.DetailRestaurantPOJO;
+import com.khamvongsa.victor.go4lunch.model.RestaurantNotification;
 import com.khamvongsa.victor.go4lunch.model.UserStateItem;
 import com.khamvongsa.victor.go4lunch.ui.FactoryViewModel;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantViewModel;
 import com.khamvongsa.victor.go4lunch.ui.UserViewModel;
+import com.khamvongsa.victor.go4lunch.ui.helper.NotificationHelper;
 import com.khamvongsa.victor.go4lunch.ui.views.DetailsRestaurantAdapter;
 import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
 
@@ -32,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -57,12 +63,16 @@ public class DetailsRestaurantFragment extends Fragment {
 
     private static final String USERS_LIKING_LIST_FIELD = "usersLikingList";
     private static final String KEY_PLACE_ID = "placeId";
+
     private String mPlaceId = null;
     private String mPlaceName = null;
     private String mPhotoReference;
     private String mUserId;
+    private String mUserName;
     private List<String> mUsersLikingList = new ArrayList<>();
     private List<UserStateItem> mUsersEatingList = new ArrayList<>();
+
+
 
     private Disposable disposable;
 
@@ -79,20 +89,36 @@ public class DetailsRestaurantFragment extends Fragment {
     TextView mRestaurantWebsite;
     ImageButton mRestaurantChosenButton;
 
+
     public DetailsRestaurantFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //mUserId = mUserManager.getCurrentUser().getUid();
+        mUserId = mUserManager.getCurrentUser().getUid();
+        mUserName = mUserManager.getCurrentUser().getDisplayName();
         Bundle b = requireActivity().getIntent().getExtras();
         if (b != null && b.getString(KEY_PLACE_ID) != null) {
             mPlaceId = b.getString(KEY_PLACE_ID);
-            //executeHttpRequestWithRetrofit(mPlaceId);
+            executeHttpRequestWithRetrofit(mPlaceId);
         }
         mUserViewModel = new ViewModelProvider(this, FactoryViewModel.getInstance()).get(UserViewModel.class);
         mRestaurantViewModel = new ViewModelProvider(this, FactoryViewModel.getInstance()).get(RestaurantViewModel.class);
         mDetailsRestaurantAdapter = new DetailsRestaurantAdapter();
+        createNotificationChannel();
+    }
+
+    private void createNotificationChannel() {
+        // Support Version >= Android 8
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = String.valueOf(R.string.default_notification_channel_id) ;
+            CharSequence channelName = "Notification Messages";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel mChannel = new NotificationChannel(channelId, channelName, importance);
+
+            NotificationManager notificationManager = requireContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(mChannel);
+        }
     }
 
     private void updateViewFragment(View view,String placeId) {
@@ -113,7 +139,7 @@ public class DetailsRestaurantFragment extends Fragment {
         RecyclerView recyclerView = mRootView.findViewById(R.id.activity_restaurant_list_workmates);
         recyclerView.setAdapter(mDetailsRestaurantAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //getUsersEatingList();
+        getUsersEatingList();
         return mRootView;
     }
 
@@ -211,7 +237,7 @@ public class DetailsRestaurantFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         updateEatButtonOnClick();
-                        mRestaurantManager.createChosenRestaurant(mPlaceId, restaurant.getResult().getName());
+                        mRestaurantManager.createChosenRestaurant(mPlaceId, restaurant.getResult().getName(), restaurant.getResult().getFormattedAddress());
                     }
                 });
                 mRestaurantViewModel.getUsersEatingList(mPlaceId);
@@ -227,12 +253,8 @@ public class DetailsRestaurantFragment extends Fragment {
         });
     }
 
-
-
     // USER LIKE RESTAURANT
-
     // TODO : Help from https://stackoverflow.com/questions/54604602/how-to-obtain-simple-listt-from-android-livedatalistt
-
     public void updateLikeButtonOnStart(){
         mRestaurantViewModel.getAllUsersLikeIdList().observe(requireActivity(), new Observer<List<String>>() {
             @SuppressLint("UseCompatLoadingForDrawables")
@@ -281,7 +303,6 @@ public class DetailsRestaurantFragment extends Fragment {
     }
 
     // USER EAT TO RESTAURANT
-
     public void updateEatButtonOnStart(){
         mRestaurantViewModel.getAllUsersEatingList().observe(requireActivity(), new Observer<List<UserStateItem>>() {
             @SuppressLint("UseCompatLoadingForDrawables")
@@ -308,19 +329,38 @@ public class DetailsRestaurantFragment extends Fragment {
             mRestaurantManager.removeUsersEating(mPlaceId);
             mRestaurantManager.decreaseUsersEatingCount(mPlaceId);
             mUserManager.deleteChosenRestaurant();
+            NotificationHelper.cancelAlarm(getActivity());
             mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_empty));
         }else{
+            NotificationHelper.cancelAlarm(getActivity());
             Log.e(TAG, "List when userEating not found OnClick " + mUsersEatingList.toString());
             mRestaurantManager.addUsersEating(mPlaceId);
             mRestaurantManager.addUsersEatingCount(mPlaceId);
             mUserManager.updateChosenRestaurantIdAndName(mPlaceId,mPlaceName);
+            updateRestaurantNotification(mPlaceId);
             mRestaurantChosenButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_like));
+        }
+    }
+
+    private void updateRestaurantNotification(String chosenRestaurantId){
+        if (chosenRestaurantId != null){
+            mRestaurantViewModel.getRestaurantNotification().observe(this.requireActivity(), new Observer<RestaurantNotification>() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onChanged(RestaurantNotification restaurantNotification) {
+                    if(userEatAtRestaurant(mUsersEatingList)){
+                        NotificationHelper.customNotificationText(getActivity(), restaurantNotification);
+                    }
+                }
+            });
+            mRestaurantViewModel.getRestaurantInfoNotification(chosenRestaurantId);
         }
     }
 
     public void updateOtherRestaurantEatingList(){
         if(userEatAtRestaurant(mUsersEatingList)){
             mRestaurantManager.deleteUserEatingAtOtherRestaurant(mPlaceId);
+            mDetailsRestaurantAdapter.notifyDataSetChanged();
         }
     }
 
@@ -360,6 +400,5 @@ public class DetailsRestaurantFragment extends Fragment {
     public void onStop() {
         super.onStop();
         updateOtherRestaurantEatingList();
-        mDetailsRestaurantAdapter.notifyDataSetChanged();
     }
 }

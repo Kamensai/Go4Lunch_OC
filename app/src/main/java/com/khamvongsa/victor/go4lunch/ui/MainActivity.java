@@ -1,7 +1,6 @@
 package com.khamvongsa.victor.go4lunch.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import com.khamvongsa.victor.go4lunch.ui.helper.LocaleHelper;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 
 import java.lang.reflect.Field;
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -32,7 +30,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.preference.PreferenceManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -97,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         mToggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(mToggle);
         mToggle.syncState();
-/*
+
         mUserViewModel.getChosenRestaurantId().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String chosenRestaurantId) {
@@ -107,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
         });
         mUserViewModel.getUserChosenRestaurant();
 
-
- */
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {

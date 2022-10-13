@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.khamvongsa.victor.go4lunch.manager.UserManager;
 import com.khamvongsa.victor.go4lunch.model.Restaurant;
+import com.khamvongsa.victor.go4lunch.model.RestaurantNotification;
 import com.khamvongsa.victor.go4lunch.model.User;
 
 import java.util.ArrayList;
@@ -46,8 +47,12 @@ public final class RestaurantRepository {
     private static final String USERS_EATING_COUNT_FIELD = "usersEatingCount";
     private static final String USERS_LIKING_LIST_FIELD = "usersLikingList";
     private static final String USERS_LIKING_COUNT_FIELD = "usersLikingCount";
+    private static final String RESTAURANT_NAME = "name";
+    private static final String RESTAURANT_ADDRESS = "address";
 
     private final MutableLiveData<List<User>> mListOfUsersEatingRestaurant = new MutableLiveData<>();
+
+    private final MutableLiveData<RestaurantNotification> mRestaurantNotification = new MutableLiveData<>();
 
     private final MutableLiveData<List<String>> mListOfUsersLikingIdRestaurant = new MutableLiveData<>();
 
@@ -114,11 +119,11 @@ public final class RestaurantRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public void createReferenceToRestaurantChosen(String restaurantId, String name ){
+    public void createReferenceToRestaurantChosen(String restaurantId, String name, String address ){
         if (restaurantId != null) {
             String uid = userManager.getCurrentUser().getUid();
             DocumentReference userDocRef = getUsersCollection().document(uid);
-            Restaurant restaurantToCreate = new Restaurant(restaurantId, name);
+            Restaurant restaurantToCreate = new Restaurant(restaurantId, name, address);
             Task<DocumentSnapshot> restaurantData = getRestaurantToEatData(restaurantId);
             // If the restaurant already exist in Firestore, we get his data.
             restaurantData.addOnSuccessListener(documentSnapshot -> {
@@ -185,6 +190,10 @@ public final class RestaurantRepository {
 
     public MutableLiveData<List<User>> getAllUsersEatingListMutableLiveData() {
         return mListOfUsersEatingRestaurant;
+    }
+
+    public MutableLiveData<RestaurantNotification> getRestaurantNotificationMutableLiveData() {
+        return mRestaurantNotification;
     }
 
     public MutableLiveData<List<Restaurant>> getAllRestaurantLikedListMutableLiveData() {
@@ -261,6 +270,56 @@ public final class RestaurantRepository {
                 } else {
                     mListOfRestaurantEating.postValue(null);
                     Log.d(TAG, "Error getting documents: ", task.getException());
+                }
+            }
+        });
+    }
+
+    //GET INFOS NOTIFICATIONS
+    @SuppressWarnings("unchecked")
+    public void getInfoNotification(String restaurantId) {
+        if (restaurantId  == null) {
+            Log.e(TAG, "restaurantId is null");
+        }
+        this.getRestaurantEatingDoc(restaurantId).addSnapshotListener(new EventListener<DocumentSnapshot>(){
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+                if (snapshot != null && snapshot.exists()) {
+                    String name = (String) snapshot.get(RESTAURANT_NAME);
+                    String address = (String) snapshot.get(RESTAURANT_ADDRESS);
+
+                    List<DocumentReference> list = (List<DocumentReference>) snapshot.get(USERS_EATING_LIST_FIELD);
+                    List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
+                    if (list != null) {
+                        for (DocumentReference documentReference : list) {
+                            Task<DocumentSnapshot> documentSnapshotTask = documentReference.get();
+                            tasks.add(documentSnapshotTask);
+                        }
+                        Tasks.whenAllSuccess(tasks).addOnSuccessListener(new OnSuccessListener<List<Object>>() {
+                            @Override
+                            public void onSuccess(List<Object> list) {
+                                List<String> userEatingList = new ArrayList<>();
+                                //Do what you need to do with your list
+                                for (Object object : list) {
+                                    User user = ((DocumentSnapshot) object).toObject(User.class);
+                                    assert user != null;
+                                    Log.d(TAG, user.getUsername());
+                                    userEatingList.add(user.getUsername());
+                                }
+                                RestaurantNotification infoRestaurant = new RestaurantNotification(name, address,userEatingList);
+                                mRestaurantNotification.postValue(infoRestaurant);
+                                Log.d(TAG, "Current USERS_EATING_LIST_FIELD : " + userEatingList);
+                            }
+                        });
+                    }
+                } else {
+                    Log.d(TAG, "Current data: null");
+                    mRestaurantNotification.postValue(null);
                 }
             }
         });

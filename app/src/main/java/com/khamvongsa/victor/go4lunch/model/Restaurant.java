@@ -62,6 +62,18 @@ public class Restaurant implements Serializable {
         this.usersEatingCount = 0;
         this.usersLikingCount = 0;
     }
+
+    public Restaurant (String restaurantId, String name, String address) {
+        this.restaurantId = restaurantId;
+        this.name = name;
+        this.address = address;
+        this.distance = 0;
+        this.type = null;
+        this.usersEatingList = null;
+        this.usersLikingList = null;
+        this.usersEatingCount = 0;
+        this.usersLikingCount = 0;
+    }
     // TODO : Collection for restaurants liked and restaurants chosen
     public Restaurant (String restaurantId) {
         this.restaurantId = restaurantId;

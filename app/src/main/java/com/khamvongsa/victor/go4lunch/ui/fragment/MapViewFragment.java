@@ -2,10 +2,7 @@ package com.khamvongsa.victor.go4lunch.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -37,9 +34,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.khamvongsa.victor.go4lunch.BuildConfig;
 import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.model.DetailRestaurantPOJO;
 import com.khamvongsa.victor.go4lunch.model.NearbyRestaurantPOJO;
@@ -49,7 +44,6 @@ import com.khamvongsa.victor.go4lunch.model.RestaurantLikedItem;
 import com.khamvongsa.victor.go4lunch.model.RestaurantLocation;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantActivity;
 import com.khamvongsa.victor.go4lunch.ui.RestaurantViewModel;
-import com.khamvongsa.victor.go4lunch.ui.helper.LocaleHelper;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 import com.khamvongsa.victor.go4lunch.ui.views.MapSearchViewAdapter;
 import com.khamvongsa.victor.go4lunch.utils.MapAPIStream;
@@ -69,7 +63,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
@@ -152,13 +145,10 @@ public class MapViewFragment extends Fragment{
 
         //Get Data from ViewModels
         mRestaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
-        /*
         mRestaurantViewModel.getRestaurantsLikedList();
         getAllRestaurantsLikedList();
         mRestaurantViewModel.getRestaurantsEatingList();
         getAllRestaurantsEatingList();
-
-         */
 
         View view = inflater.inflate(R.layout.fragment_map_view, container, false);
 
@@ -173,7 +163,7 @@ public class MapViewFragment extends Fragment{
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.google_map);
         assert mapFragment != null;
-        /*
+
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -202,7 +192,7 @@ public class MapViewFragment extends Fragment{
             }
         });
 
-         */
+
         // Inflate the layout for this fragment
         return view;
     }
@@ -293,7 +283,7 @@ public class MapViewFragment extends Fragment{
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(lastKnownLocation.getLatitude(),
                                                 lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                                //executeHttpRequestWithRetrofit(lastKnownLocation);
+                                executeHttpRequestWithRetrofit(lastKnownLocation);
                             }
 
                         } else {
@@ -480,56 +470,57 @@ public class MapViewFragment extends Fragment{
         this.mDisposableRestaurantDetails = MapAPIStream.streamFetchOpenRestaurant(restaurantId).subscribeWith(new DisposableObserver<DetailRestaurantPOJO>() {
             @Override
             public void onNext(@NotNull DetailRestaurantPOJO restaurant) {
-                restaurantIsLiked(mRestaurantLikedList, restaurantId);
-                restaurantIsEatingAt(mRestaurantEatingList, restaurantId);
+                if (restaurant.getResult() != null){
+                    restaurantIsLiked(mRestaurantLikedList, restaurantId);
+                    restaurantIsEatingAt(mRestaurantEatingList, restaurantId);
 
-                //Name and Address
-                String name = restaurant.getResult().getName();
-                String address = restaurant.getResult().getFormattedAddress();
+                    //Name and Address
+                    String name = restaurant.getResult().getName();
+                    String address = restaurant.getResult().getFormattedAddress();
 
-                //Picture
-                String urlPicture;
-                if (restaurant.getResult().getPhotos() != null && !restaurant.getResult().getPhotos().isEmpty()) {
-                    urlPicture = MapAPIStream.getImageUrl(restaurant.getResult().getPhotos().get(0).getPhotoReference());
-                } else {
-                    urlPicture = "null";
-                }
-                Log.e(TAG, urlPicture);
+                    //Picture
+                    String urlPicture;
+                    if (restaurant.getResult().getPhotos() != null && !restaurant.getResult().getPhotos().isEmpty()) {
+                        urlPicture = MapAPIStream.getImageUrl(restaurant.getResult().getPhotos().get(0).getPhotoReference());
+                    } else {
+                        urlPicture = "null";
+                    }
+                    Log.e(TAG, urlPicture);
 
-                // Opening Hours
-                Calendar date = Calendar.getInstance(Locale.FRANCE);
-                int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-                System.out.println("Day Of the Week : " + dayOfWeek);
-                Boolean openNow = false;
-                String openUntil = "null";
+                    // Opening Hours
+                    Calendar date = Calendar.getInstance(Locale.FRANCE);
+                    int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
+                    System.out.println("Day Of the Week : " + dayOfWeek);
+                    Boolean openNow = false;
+                    String openUntil = "null";
 
-                if (restaurant.getResult().getOpeningHours() != null) {
-                    openNow = restaurant.getResult().getOpeningHours().getOpenNow();
-                    if (openNow){
-                        List<DetailRestaurantPOJO.Period> listOpenPeriods = restaurant.getResult().getOpeningHours().getPeriods();
-                        if (listOpenPeriods.size() > 0 ){
-                            int i = 0;
-                            while ( i < listOpenPeriods.size()){
-                                int realDayOfWeek = dayOfWeek - 1;
-                                System.out.println("Day Of the Week : " + realDayOfWeek + " == restaurantDay " + listOpenPeriods.get(i).getOpen().getDay());
-                                if ((realDayOfWeek) == listOpenPeriods.get(i).getOpen().getDay()){
-                                    openUntil = listOpenPeriods.get(i).getClose().getTime();
-                                    break;
+                    if (restaurant.getResult().getOpeningHours() != null) {
+                        openNow = restaurant.getResult().getOpeningHours().getOpenNow();
+                        if (openNow){
+                            List<DetailRestaurantPOJO.Period> listOpenPeriods = restaurant.getResult().getOpeningHours().getPeriods();
+                            if (listOpenPeriods.size() > 0 ){
+                                int i = 0;
+                                while ( i < listOpenPeriods.size()){
+                                    int realDayOfWeek = dayOfWeek - 1;
+                                    System.out.println("Day Of the Week : " + realDayOfWeek + " == restaurantDay " + listOpenPeriods.get(i).getOpen().getDay());
+                                    if ((realDayOfWeek) == listOpenPeriods.get(i).getOpen().getDay()){
+                                        openUntil = listOpenPeriods.get(i).getClose().getTime();
+                                        break;
+                                    }
+                                    i++;
                                 }
-                                i++;
                             }
                         }
                     }
+
+                    // Distance
+                    float[] resultDistance = new float[2];
+                    Location.distanceBetween(lastKnownLocation.getLatitude(),lastKnownLocation.getLongitude(),
+                            restaurant.getResult().getGeometry().getLocation().getLat(), restaurant.getResult().getGeometry().getLocation().getLng(), resultDistance);
+                    int distance = (int)Math.round(resultDistance[0]);
+                    Restaurant createRestaurant = new Restaurant(restaurantId, name, address, urlPicture, openNow, openUntil, mCountUsersLiking, mCountUsersEating, distance);
+                    mRestaurantList.add(createRestaurant);
                 }
-
-                // Distance
-                float[] resultDistance = new float[2];
-                Location.distanceBetween(lastKnownLocation.getLatitude(),lastKnownLocation.getLongitude(),
-                        restaurant.getResult().getGeometry().getLocation().getLat(), restaurant.getResult().getGeometry().getLocation().getLng(), resultDistance);
-                int distance = (int)Math.round(resultDistance[0]);
-
-                Restaurant createRestaurant = new Restaurant(restaurantId, name, address, urlPicture, openNow, openUntil, mCountUsersLiking, mCountUsersEating, distance);
-                mRestaurantList.add(createRestaurant);
             }
 
             @Override

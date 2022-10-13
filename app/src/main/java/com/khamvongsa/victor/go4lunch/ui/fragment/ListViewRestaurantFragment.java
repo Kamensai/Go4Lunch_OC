@@ -79,7 +79,7 @@ public class ListViewRestaurantFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mRestaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
-        //getAllRestaurantList();
+        getAllRestaurantList();
         mRestaurantAdapter = new RestaurantAdapter(mRestaurantStateItemList);
 
         if (getArguments() != null) {

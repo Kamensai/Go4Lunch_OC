@@ -17,7 +17,7 @@ public class MapAPIStream {
 
     public static Observable<NearbyRestaurantPOJO> streamFetchNearbyRestaurant(String location){
         MapAPIService mapAPIService = MapAPIService.retrofit.create(MapAPIService.class);
-        return mapAPIService.getNearby(location, "restaurant", 400, BuildConfig.MAPS_API_KEY)
+        return mapAPIService.getNearby(location, "restaurant", 100, BuildConfig.MAPS_API_KEY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS);
