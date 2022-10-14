@@ -10,6 +10,7 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.OAuthProvider;
 import com.khamvongsa.victor.go4lunch.R;
 import com.khamvongsa.victor.go4lunch.manager.UserManager;
 import com.khamvongsa.victor.go4lunch.ui.helper.LocaleHelper;
@@ -35,7 +36,7 @@ public class SignInActivity extends AppCompatActivity {
         super.attachBaseContext(LocaleHelper.onAttach(newBase, "en"));
     }
 
-
+    // help twitter  : https://www.youtube.com/watch?v=DApQaSg8NsM&ab_channel=TechnicalSkillz
     // See: https://developer.android.com/training/basics/intents/result
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(),
@@ -62,7 +63,8 @@ public class SignInActivity extends AppCompatActivity {
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.GoogleBuilder().build(),
-                new AuthUI.IdpConfig.FacebookBuilder().build());
+                new AuthUI.IdpConfig.FacebookBuilder().build(),
+                new AuthUI.IdpConfig.TwitterBuilder().build());
 
         // Launch the activity
         Intent signInIntent = AuthUI.getInstance()
