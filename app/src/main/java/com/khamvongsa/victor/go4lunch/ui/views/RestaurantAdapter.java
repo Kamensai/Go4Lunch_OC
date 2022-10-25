@@ -1,7 +1,6 @@
 package com.khamvongsa.victor.go4lunch.ui.views;
 
 import android.annotation.SuppressLint;
-import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,98 +51,6 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bind(getItem(position));
-        /*
-        String name =  mRestaurantStateItemListSearchFiltered.get(position).getName();
-        String address = mRestaurantStateItemListSearchFiltered.get(position).getAddress();
-
-        int likingCount = mRestaurantStateItemListSearchFiltered.get(position).getUsersLikingCount();
-        int eatingCount = mRestaurantStateItemListSearchFiltered.get(position).getUsersEatingCount();
-        String eatingCountString = String.valueOf(eatingCount);
-        String urlPicture = mRestaurantStateItemListSearchFiltered.get(position).getUrlPicture();
-        Boolean openNow = mRestaurantStateItemListSearchFiltered.get(position).getOpenNow();
-        String openUntil = mRestaurantStateItemListSearchFiltered.get(position).getOpenUntil();
-        int distance = mRestaurantStateItemListSearchFiltered.get(position).getDistance();
-
-        int nameColor = holder.mItemRestaurant.getResources().getColor(R.color.black);
-
-        // Name
-        holder.mRestaurantNameTextView.setText(name);
-        holder.mRestaurantNameTextView.setTextColor(nameColor);
-
-        //Address
-            holder.mRestaurantAddressTextView.setText(address);
-
-        //IS LIKED
-        if (likingCount > 2 ){
-            Log.e(TAG, holder.mRestaurantNameTextView.getText().toString());
-            Log.e(TAG, name);
-            System.out.println(TAG + likingCount);
-            holder.mRestaurantFirstStarImageView.setImageResource(R.drawable.ic_like_yellow);
-            holder.mRestaurantSecondStarImageView.setImageResource(R.drawable.ic_like_yellow);
-            holder.mRestaurantThirdStarImageView.setImageResource(R.drawable.ic_like_yellow);
-            holder.mRestaurantFirstStarImageView.setVisibility(View.VISIBLE);
-            holder.mRestaurantSecondStarImageView.setVisibility(View.VISIBLE);
-            holder.mRestaurantThirdStarImageView.setVisibility(View.VISIBLE);
-        } else if (likingCount > 1 ){
-            holder.mRestaurantFirstStarImageView.setImageResource(R.drawable.ic_like_yellow);
-            holder.mRestaurantSecondStarImageView.setImageResource(R.drawable.ic_like_yellow);
-            holder.mRestaurantFirstStarImageView.setVisibility(View.VISIBLE);
-            holder.mRestaurantSecondStarImageView.setVisibility(View.VISIBLE);
-            holder.mRestaurantThirdStarImageView.setVisibility(View.INVISIBLE);
-        } else if (likingCount > 0 ) {
-            holder.mRestaurantFirstStarImageView.setImageResource(R.drawable.ic_like_yellow);
-            holder.mRestaurantFirstStarImageView.setVisibility(View.VISIBLE);
-            holder.mRestaurantSecondStarImageView.setVisibility(View.INVISIBLE);
-            holder.mRestaurantThirdStarImageView.setVisibility(View.INVISIBLE);
-        } else {
-            holder.mRestaurantFirstStarImageView.setVisibility(View.INVISIBLE);
-            holder.mRestaurantSecondStarImageView.setVisibility(View.INVISIBLE);
-            holder.mRestaurantThirdStarImageView.setVisibility(View.INVISIBLE);
-        }
-
-        //IS EATING
-        if (eatingCount > 0){
-            System.out.println(TAG + eatingCount);
-            holder.mRestaurantUserIconImageView.setImageResource(R.drawable.ic_user);
-            holder.mRestaurantUserIconImageView.setVisibility(View.VISIBLE);
-            holder.mRestaurantNumberUserEatingTextView.setText(eatingCountString);
-            holder.mRestaurantNumberUserEatingTextView.setVisibility(View.VISIBLE);
-        } else {
-            holder.mRestaurantUserIconImageView.setVisibility(View.INVISIBLE);
-            holder.mRestaurantNumberUserEatingTextView.setVisibility(View.INVISIBLE);
-        }
-        if (distance > 0){
-            String sDistance = String.valueOf(distance);
-            holder.mRestaurantDistanceTextView.setText(sDistance + "m");
-            holder.mRestaurantDistanceTextView.setVisibility(View.VISIBLE);
-        } else {
-            holder.mRestaurantDistanceTextView.setVisibility(View.INVISIBLE);
-        }
-
-        // IS OPEN
-        if (openNow != null && openNow) {
-            holder.mRestaurantOpeningHourTextView.setText("Open until " + openUntil);
-        } else if (openNow != null && !openNow) {
-            holder.mRestaurantOpeningHourTextView.setText("restaurant is closed");
-        }
-
-        //URLPICTURE
-        if (urlPicture.equals("null")){
-            Glide.with(holder.mRestaurantAvatarImageView.getContext())
-                    .load(R.drawable.ic_no_photo)
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(holder.mRestaurantAvatarImageView);
-            } else {
-                Glide.with(holder.mRestaurantAvatarImageView.getContext())
-                        .load(urlPicture)
-                        .apply(RequestOptions.circleCropTransform())
-                        .into(holder.mRestaurantAvatarImageView);
-            }
-        holder.mItemRestaurant.setOnClickListener(view -> {
-            NavigationHelper.launchRestaurantActivity(holder.mItemRestaurant.getContext(), RestaurantActivity.class,  mRestaurantStateItemListSearchFiltered.get(position).getRestaurantId());
-        });
-
-         */
     }
 
 
@@ -231,6 +138,13 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
         public void bind(RestaurantStateItem item) {
             int likingCount = item.getUsersLikingCount();
             int eatingCount = item.getUsersEatingCount();
+            String closingHour = item.getOpenUntil();
+            StringBuilder closingHourFormat = new StringBuilder(closingHour);
+            closingHourFormat.setLength(5);
+            closingHourFormat.setCharAt(2,'h');
+            closingHourFormat.setCharAt(3,closingHour.charAt(2));
+            closingHourFormat.setCharAt(4,closingHour.charAt(3));
+
             String eatingCountString = String.valueOf(eatingCount);
             String openUntil = itemView.getContext().getResources().getString(R.string.open_until);
             String closedRestaurant = itemView.getContext().getResources().getString(R.string.closed_restaurant);
@@ -292,7 +206,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
 
             // IS OPEN
             if (item.getOpenNow() != null && item.getOpenNow()) {
-                mRestaurantOpeningHourTextView.setText(openUntil + item.getOpenUntil());
+                mRestaurantOpeningHourTextView.setText(openUntil + closingHourFormat);
             } else if (item.getOpenNow() != null && !item.getOpenNow()) {
                 mRestaurantOpeningHourTextView.setText(closedRestaurant);
             }
