@@ -6,13 +6,20 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.khamvongsa.victor.go4lunch.R;
+import com.khamvongsa.victor.go4lunch.manager.UserManager;
+import com.khamvongsa.victor.go4lunch.model.User;
 import com.khamvongsa.victor.go4lunch.ui.helper.LocaleHelper;
 import com.khamvongsa.victor.go4lunch.ui.helper.NavigationHelper;
 
@@ -43,6 +50,13 @@ public class MainActivity extends AppCompatActivity {
     NavigationView mNavigationView;
     Toolbar mToolbar;
     ActionBarDrawerToggle mToggle;
+
+    private UserManager mUserManager = UserManager.getInstance();
+    private String mUserPictureUrl;
+
+    ImageView mUserPicture;
+    TextView mUserName;
+    TextView mUserEmail;
 
     //UpdateView
     private Boolean localeChanged = false;
@@ -94,6 +108,12 @@ public class MainActivity extends AppCompatActivity {
         mToggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(mToggle);
         mToggle.syncState();
+
+        View headerView = mNavigationView.getHeaderView(0);
+        mUserName = headerView.findViewById(R.id.user_name_header_navigation_drawer);
+        mUserEmail = headerView.findViewById(R.id.user_email_header_navigation_drawer);
+        mUserPicture = headerView.findViewById(R.id.user_picture_header_navigation_drawer);
+        setUserDataInNavigationDrawer();
 
         mUserViewModel.getChosenRestaurantId().observe(this, new Observer<String>() {
             @Override
@@ -148,6 +168,26 @@ public class MainActivity extends AppCompatActivity {
         mNavController = Navigation.findNavController(this, R.id.navHostFragment);
         NavigationUI.setupActionBarWithNavController(this, mNavController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(mBottomNavigationView, mNavController);
+    }
+
+    public void setUserDataInNavigationDrawer(){
+        Task<User> userData = mUserManager.getUserData();
+        // If the user already exist in Firestore, we get his data (isMentor)
+        userData.addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.getUrlPicture() != null){
+                mUserPictureUrl = documentSnapshot.getUrlPicture();
+                Glide.with(mUserPicture)
+                        .load(mUserPictureUrl)
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(mUserPicture);
+            }
+            if (documentSnapshot.getUsername() != null){
+                mUserName.setText(documentSnapshot.getUsername());
+            }
+            if (documentSnapshot.getMail() != null){
+                mUserEmail.setText(documentSnapshot.getMail());
+            }
+        });
     }
 
     // TOGGLE MENU
